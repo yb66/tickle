@@ -20,6 +20,6 @@ server_offset = Time.now.utc_offset / 60 / 60
   time = Tickle.parse(s)[:next]
   print s, " --> server date: ", time
   puts
-  print s, " --> utc date: ", time - Time.now.utc_offset
+  print s, " --> utc date: ", time.utc
   puts
 }
