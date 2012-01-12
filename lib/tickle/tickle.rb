@@ -1,3 +1,5 @@
+require_relative "../numerizer/numerizer.rb"
+
 module Tickle
   class << self
 
