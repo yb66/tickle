@@ -17,5 +17,8 @@ tmtags
 coverage
 rdoc
 pkg
+bin/
+vendor/
+Gemfile.lock
 
 ## PROJECT::SPECIFIC
