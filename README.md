@@ -1,82 +1,66 @@
-= tickle
-  http://github.com/noctivityinc/tickle
-  by Joshua Lippiner, Noctivity
+## Tickle ##
 
-== *LEGACY WARNING*
+This is now the home of ***Tickle***, previously found at [github.com/noctivityinc/tickle](https://github.com/noctivityinc/tickle)
 
-If you starting using Tickle pre version 0.1.X, you will need to update your code to either include the :next_only => true option or read correctly from the options hash.  Sorry.
-
-== DESCRIPTION
+### DESCRIPTION ###
 
 Tickle is a natural language parser for recurring events.
  
-Tickle is designed to be a compliment of Chronic and can interpret things such as "every 2 days, every Sunday, Sundays, Weekly, etc."
+Tickle is designed to be a complement to [Chronic](https://rubygems.org/gems/chronic) and can interpret things such as "every 2 days, every Sunday, Sundays, Weekly, etc."
 
-In a lot of ways Tickle is actually an enhancement of Chronic, handling a lot of things that Chronic can't, such as commas and US Holidays (yup - you can do Tickle.parse('Christmas Eve'))
+Tickle has one main method, `Tickle.parse`, which returns the next time the event should occur, at which point you simply call `Tickle.parse` again.   
 
-Tickle has one main method, "Tickle.parse," which returns the next time the event should occur, at which point you simply call Tickle.parse again.   
+### *LEGACY WARNING* ###
 
-== INSTALLATION
+If you starting using Tickle pre version 0.1.X, you will need to update your code to either include the `:next_only => true` option or read correctly from the options hash.  Sorry.
 
-Tickle can be installed via RubyGems:
 
-$ gem install tickle
+### USAGE ###
 
-== TINKERING
+You can parse strings containing a natural language interval using the `Tickle.parse` method.
 
-Everything's at Github - http://github.com/noctivityinc/tickle
-
-== DEPENDENCIES
-
-chronic gem (gem install chronic)
-
-thoughtbot's shoulda (gem install shoulda)
-
-== USAGE
-
-You can parse strings containing a natural language interval using the Tickle.parse method.
-
-You can either pass a string prefixed with the word "every, each or 'on the'" or simply the time frame.   
+You can either pass a string prefixed with the word "every", "each" or "on the" or simply the timeframe.
 
 Tickle.parse returns a hash containing the following keys:
-* next = the next occurrence of the event.  This is NEVER today as its always the next date in the future.
-* starting = the date all calculations as based on.  If not passed as an option, the start date is right now.
-* until = the last date you want this event to run until.
-* expression = this is the natural language expression to store to run through tickle later to get the next occurrence.
+* `next` the next occurrence of the event.  This is NEVER today as its always the next date in the future.
+* `starting` the date all calculations as based on.  If not passed as an option, the start date is right now.
+* `until` the last date you want this event to run until.
+* `expression` this is the natural language expression to store to run through tickle later to get the next occurrence.
 
-Tickle returns nil if it cannot parse the string cannot be parsed.
+Tickle returns `nil` if it cannot parse the string.
 
-Tickle HEAVILY uses chronic for parsing but mostly the start and until phrases.
+Tickle ***heavily*** uses Chronic for parsing both the event and the start date.
 
-=== OPTIONS
+### OPTIONS ###
 
 There are two ways to pass options: natural language or an options hash.
 
 NATURAL LANGUAGE:
-* Pass a start date with the word "starting, start, stars" (e.g. Tickle.parse('every 3 days starting next friday'))
-* Pass an end date with the word "until, end, ends, ending" (e.g. Tickle.parse('every 3 days until next friday'))
-* Pass both at the same time (e.g. "starting May 5th repeat every other week until December 1")
+* Pass a start date with the word "starting", "start", or "stars" e.g. `Tickle.parse('every 3 days starting next friday')`
+* Pass an end date with the word "until", "end", "ends", or "ending" e.g. `Tickle.parse('every 3 days until next friday')`
+* Pass both at the same time e.g. `"starting May 5th repeat every other week until December 1"`
 
 OPTIONS HASH
 Valid options are:
-* start - must be a valid date or Chronic date expression. (e.g. Tickle.parse('every other day', {:start => Date.new(2010,8,1) }))
-* until - must be a valid date or Chronic date expression. (e.g. Tickle.parse('every other day', {:until => Date.new(2010,10,1) }))
-* next_only - legacy switch to ONLY return the next occurrence as a date and not return a hash
+* `start` - must be a valid date or Chronic date expression. e.g. `Tickle.parse('every other day', {:start => Date.new(2010,8,1) })`
+* `until` - must be a valid date or Chronic date expression. e.g. `Tickle.parse('every other day', {:until => Date.new(2010,10,1) })`
+* `next_only` - legacy switch to *only* return the next occurrence as a date and not return a hash
 
-=== SUPER IMPORTANT NOTE ABOUT NEXT OCCURRENCE & START DATE
+### SUPER IMPORTANT NOTE ABOUT NEXT OCCURRENCE & START DATE ###
 
-You may notice when parsing an expression with a start date that the next occurrence IS the start date passed.  This is DESIGNED BEHAVIOR.  
+You may notice when parsing an expression with a start date that the next occurrence **is** the start date passed.  This is **designed behaviour**.  
 
 Here's why - assume your user says "remind me every 3 weeks starting Dec 1" and today is May 8th.  Well the first reminder needs to be sent on Dec 1, not Dec 21 (three weeks later). 
 
-If you don't like that, fork and have fun but don't say I didn't warn ya.
+If you don't like that, fork and have fun but don't say you weren't warned.
 
-=== EXAMPLES
 
-  require 'rubygems'
-  require 'tickle'
+### EXAMPLES ###
 
-SIMPLE
+    require 'tickle'
+    
+#### SIMPLE ####
+
     Tickle.parse('day')
       #=> {:next=>2010-05-10 20:57:36 -0400, :expression=>"day", :starting=>2010-05-09 20:57:36 -0400, :until=>nil}
 
@@ -230,7 +214,8 @@ SIMPLE
     Tickle.parse('the twenty first of the month', {:start=>#<Date: 2020-04-01 (4917881/2,0,2299161)>, :now=>#<Date: 2020-04-01 (4917881/2,0,2299161)>})
       #=> {:next=>2020-04-21 00:00:00 -0400, :expression=>"the twenty first of the month", :starting=>2020-04-01 00:00:00 -0400, :until=>nil}
 
-COMPLEX
+#### COMPLEX ####
+
     Tickle.parse('starting today and ending one week from now')
       #=> {:next=>2010-05-10 22:30:00 -0400, :expression=>"day", :starting=>2010-05-09 22:30:00 -0400, :until=>2010-05-16 20:57:35 -0400}
 
@@ -283,7 +268,8 @@ COMPLEX
       #=> {:next=>2010-05-12 12:00:00 -0400, :expression=>"week", :starting=>2010-05-12 12:00:00 -0400, :until=>2010-05-13 12:00:00 -0400}
 
 
-OPTIONS HASH
+#### OPTIONS HASH ####
+
     Tickle.parse('May 1st 2020', {:next_only=>true})
       #=> 2020-05-01 00:00:00 -0400
 
@@ -308,7 +294,7 @@ OPTIONS HASH
     Tickle.parse('3 months', {:until=>2010-10-09 00:00:00 -0400})
       #=> {:next=>2010-08-09 20:57:36 -0400, :expression=>"3 months", :starting=>2010-05-09 20:57:36 -0400, :until=>2010-10-09 00:00:00 -0400}
 
-US HOLIDAYS
+#### US HOLIDAYS ####
 
     Tickle.parse('New Years Day', {:start=>#<Date: 2020-01-01 (4917699/2,0,2299161)>, :now=>#<Date: 2020-01-01 (4917699/2,0,2299161)>})
       #=> {:next=>2021-01-01 12:00:00 -0500, :expression=>"january 1, 2021", :starting=>2020-01-01 00:00:00 -0500, :until=>nil}
@@ -389,48 +375,73 @@ US HOLIDAYS
       #=> {:next=>2021-01-01 12:00:00 -0500, :expression=>"january 1, 2021", :starting=>2020-01-01 00:00:00 -0500, :until=>nil}
 
 
-== USING IN APP
+### USING IN APP ###
 
 To use in your app, we recommend adding two attributes to your database model:
-* next_occurrence
-* tickle_expression
 
-Then call Tickle.parse(date expression) when you need to and save the results accordingly.  In your 
-code, each day, simply check to see if today is >= next_occurrence and, if so, run your block.
+* `next_occurrence`
+* `tickle_expression`
 
-After it completes, call Tickle.parse(tickle_expression) again to update the next occurrence of the event.
+Then call `Tickle.parse("date expression goes here")` when you need to and save the results accordingly.  In your 
+code, each day, simply check to see if today is `>= next_occurrence` and, if so, run your block.
+
+After it completes, call `next_occurrence = Tickle.parse(tickle_expression)` again to update the next occurrence of the event.
 
 
-== TESTING
+### INSTALLATION ###
+
+Tickle can be installed via RubyGems:
+
+    gem install tickle
+
+or if you're using Bundler, add this to the Gemfile:
+
+    gem "tickle"
+
+### DEPENDENCIES ###
+
+Chronic gem:
+
+`gem install chronic`
+
+thoughtbot's [shoulda](https://rubygems.org/gems/shoulda):
+
+`gem install shoulda`
+
+or just run `bundle install`.
+
+
+### LIMITATIONS ###
+
+Currently, Tickle only works for day intervals but feel free to fork and add time-based interval support or send me a note if you really want me to add it.
+
+
+### CONTRIBUTING ###
+
+Fork it, create a new branch for your changes, and send in a pull request.
+
+* Only tested code gets in.
+* Document it.
+* If you want to work on something but aren't sure whether it'll get in, create a new branch and open a pull request before you've done any code. That will open an issue and we can discuss it.
+* Do not mess with the Rakefile, version, or history (if you want to have your own version, that is fine but do it on a separate branch from the one I'm going to merge.)
+
+### TESTING ###
 
 Tickle comes with a full testing suite for simple, complex, options hash and invalid arguments.
 
 You also have some command line options:
-    --v     verbose output like the examples above
-    --d     debug output showing the guts of a date expression
 
-== LIMITATIONS
+* --v     verbose output like the examples above
+* --d     debug output showing the guts of a date expression
 
-Currently, Tickle only works for day intervals but feel free to fork and add time-based interval support or send me a note if you really want me to add it.
+### CREDIT ###
 
-== CREDIT
+The original work on the library was done by *Joshua Lippiner* a.k.a. [Noctivity](https://github.com/noctivityinc).
 
-HUGE shout-out to both the creator of Chronic, Tom Preston-Werner (http://chronic.rubyforge.org/) as well as Brian Brownling who maintains a github version at http://github.com/mojombo/chronic.
+***HUGE*** shout-out to both the creator of Chronic, *Tom Preston-Werner* as well as *Brian Brownling* who maintains a Github version at [github.com/mojombo/chronic](https://github.com/mojombo/chronic).
 
-Without their work and code structure I'd be lost.
+As always, ***BIG*** shout-out to the RVM Master himself, *Wayne Seguin*, for putting up with me and Ruby from day one.  Ask Wayne to make you some ciabatta bread next time you see him.
 
-As always, BIG shout-out to the RVM Master himself, Wayne Seguin, for putting up with me and Ruby from day one.  Ask Wayne to make you some Ciabatta bread next time you see him
+### LICENCE ###
 
-
-== Note on Patches/Pull Requests
-* Fork the project.
-* Make your feature addition or bug fix.
-* Add tests for it. This is important so I don't break it in a
-  future version unintentionally.
-* Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
-* Send me a pull request. Bonus points for time-based branches.
-
-== Copyright
-
-Copyright (c) 2010 Joshua Lippiner. See LICENSE for details.
+See the LICENCE file.
