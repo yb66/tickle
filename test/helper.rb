@@ -1,4 +1,9 @@
-require 'rubygems'
+require 'simplecov'
+SimpleCov.start do
+  add_filter "/vendor/"
+  add_filter "/bin/"
+end
+
 require 'test/unit'
 require 'shoulda'
 
