@@ -2,6 +2,11 @@
 
 This is now the home of ***Tickle***, previously found at [github.com/noctivityinc/tickle](https://github.com/noctivityinc/tickle)
 
+If you wish to contribute then please take a look at the Contribution section further down the page, but I'd be really, *really* grateful if anyone wishes to contribute specs. Not unit tests, but specs. This library's internals will be changing a lot over the coming months, and it would be good to have integration tests - a black-box spec of the library - to work against. Even if you've never contributed to a library before, now is your chance! I'll help anyone through with what they may need, and I promise not to be the standard snarky Open Source dictator that a lot of projects have. We'll try and improve this library together.
+
+Take a look at the `develop` branch where all this stuff will be happening.
+
+
 ### DESCRIPTION ###
 
 Tickle is a natural language parser for recurring events.
