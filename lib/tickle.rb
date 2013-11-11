@@ -16,6 +16,7 @@ require 'chronic'
 require 'tickle/tickle'
 require 'tickle/handler'
 require 'tickle/repeater'
+require 'numerizer/numerizer'
 
 module Tickle #:nodoc:
   VERSION = "0.1.7"

@@ -236,8 +236,6 @@ module Tickle
       @tokens.map(&:type)
     end
 
-    protected
-
     # Returns the next available month based on the current day of the month.
     # For example, if get_next_month(15) is called and the start date is the 10th, then it will return the 15th of this month.
     # However, if get_next_month(15) is called and the start date is the 18th, it will return the 15th of next month.
