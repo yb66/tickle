@@ -1,6 +1,6 @@
 # CH CH CH CH CHANGES! #
 
-## Monday the 11th of November, v1.0.0 ##
+## Monday the 11th of November, v1.0.1 ##
 
 * Moved library to new maintainer [https://github.com/yb66/tickle](@yb66)
 * Moved library to [http://semver.org/](semver).
