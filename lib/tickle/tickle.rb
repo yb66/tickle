@@ -19,8 +19,10 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-module Tickle  #:nodoc:
-  class << self #:nodoc:
+require_relative "../numerizer/numerizer.rb"
+
+module Tickle
+  class << self
     # == Configuration options
     #
     # * +start+ - start date for future occurrences.  Must be in valid date format.
