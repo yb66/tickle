@@ -15,7 +15,6 @@ pkg
 bin/
 vendor/
 Gemfile.lock
-spec/
 .yardoc/
 .bundle/
 .rspec
