@@ -2,9 +2,16 @@ source "https://rubygems.org"
 
 gemspec
 
-gem "wirble"
+group :development do
+  gem "wirble"
+  gem "maruku"
+  gem "yard"
+  gem "rake"
+end
+
 group :test do
   gem "rspec"
   gem "timecop"
   gem "simplecov"
+  gem "shoulda", "~> 2.10.3"
 end
