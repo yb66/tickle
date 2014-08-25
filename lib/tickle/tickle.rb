@@ -39,13 +39,13 @@ module Tickle
       options = default_options.merge specified_options
 
       # ensure an expression was provided
-      fail(InvalidArgumentException, 'date expression is required') unless text
+      fail(ArgumentError, 'date expression is required') unless text
 
       # ensure the specified options are valid
       specified_options.keys.each do |key|
-        fail(InvalidArgumentException, "#{key} is not a valid option key.") unless default_options.keys.include?(key)
+        fail(ArgumentError, "#{key} is not a valid option key.") unless default_options.keys.include?(key)
       end
-      fail(InvalidArgumentException, ':start specified is not a valid datetime.') unless  (is_date(specified_options[:start]) || Chronic.parse(specified_options[:start])) if specified_options[:start]
+      fail(ArgumentError, ':start specified is not a valid datetime.') unless  (is_date(specified_options[:start]) || Chronic.parse(specified_options[:start])) if specified_options[:start]
 
       # check to see if a valid datetime was passed
       return text if text.is_a?(Date) ||  text.is_a?(Time)
@@ -306,10 +306,6 @@ module Tickle
     end
   end
 
-  # This exception is raised if an invalid argument is provided to
-  # any of Tickle's methods
-  class InvalidArgumentException < Exception
-  end
 
   # This exception is raised if there is an issue with the parsing
   # output from the date expression provided
