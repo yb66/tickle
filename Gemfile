@@ -6,7 +6,6 @@ group :development do
   gem "wirble"
   gem "maruku"
   gem "yard"
-  gem "rake"
 end
 
 group :test do
@@ -14,4 +13,5 @@ group :test do
   gem "timecop"
   gem "simplecov"
   gem "shoulda", "~> 2.10.3"
+  gem "rake"
 end
