@@ -17,7 +17,7 @@ require 'tickle/tickle'
 require 'tickle/handler'
 require 'tickle/repeater'
 
-module Tickle #:nodoc:
+module Tickle
 
   def self.debug=(val); @debug = val; end
 
@@ -35,7 +35,7 @@ module Tickle #:nodoc:
   end
 end
 
-class Date #:nodoc:
+class Date
   # returns the days in the sending month
   def days_in_month
     d,m,y = mday,month,year
@@ -65,7 +65,7 @@ class Date #:nodoc:
   end
 end
 
-class Time #:nodoc:
+class Time
   def bump(attr, amount=nil)
     amount ||= 1
     case attr
@@ -94,7 +94,7 @@ class Time #:nodoc:
   end
 end
 
-class String #:nodoc:
+class String
   # returns true if the sending string is a text or numeric ordinal (e.g. first or 1st)
   def is_ordinal?
     scanner = %w{first second third fourth fifth sixth seventh eighth ninth tenth eleventh twelfth thirteenth fourteenth fifteenth sixteenth seventeenth eighteenth nineteenth twenty thirty thirtieth}
@@ -132,7 +132,7 @@ class String #:nodoc:
   end
 end
 
-class Array #:nodoc:
+class Array
   # compares two arrays to determine if they both contain the same elements
   def same?(y)
     self.sort == y.sort

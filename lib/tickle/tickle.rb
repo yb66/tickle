@@ -178,7 +178,7 @@ module Tickle
 
     # Split the text on spaces and convert each word into
     # a Token
-    def base_tokenize(text) #:nodoc:
+    def base_tokenize(text)
       text.split(' ').map { |word| Token.new(word) }
     end
 
@@ -193,7 +193,7 @@ module Tickle
     # converting idioms to their canonical form, converting number words
     # to numbers (three => 3), and converting ordinal words to numeric
     # ordinals (third => 3rd)
-    def normalize(text) #:nodoc:
+    def normalize(text)
       normalized_text = text.to_s.downcase
       normalized_text = Numerizer.numerize(normalized_text)
       normalized_text.gsub!(/['"\.]/, '')
@@ -203,7 +203,7 @@ module Tickle
 
     # Converts natural language US Holidays into a date expression to be
     # parsed.
-    def normalize_us_holidays(text) #:nodoc:
+    def normalize_us_holidays(text)
       normalized_text = text.to_s.downcase
       normalized_text.gsub!(/\bnew\syear'?s?(\s)?(day)?\b/, "january 1, #{next_appropriate_year(1, 1)}")
       normalized_text.gsub!(/\bnew\syear'?s?(\s)?(eve)?\b/, "december 31, #{next_appropriate_year(12, 31)}")
@@ -287,7 +287,7 @@ module Tickle
 
   end
 
-  class Token #:nodoc:
+  class Token
     attr_accessor :original, :word, :type, :interval, :start
 
     def initialize(original, word=nil, type=nil, start=nil, interval=nil)

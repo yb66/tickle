@@ -1,4 +1,4 @@
-class Tickle::Repeater < Chronic::Tag #:nodoc:
+class Tickle::Repeater < Chronic::Tag
   #
   def self.scan(tokens)
     # for each token

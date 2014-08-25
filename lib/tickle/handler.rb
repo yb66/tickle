@@ -1,5 +1,5 @@
-module Tickle #:nodoc:
-  class << self #:nodoc:
+module Tickle
+  class << self
 
     # The heavy lifting.  Goes through each token groupings to determine what natural language should either by
     # parsed by Chronic or returned.  This methodology makes extension fairly simple, as new token types can be
