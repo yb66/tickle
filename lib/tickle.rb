@@ -17,6 +17,7 @@ require 'tickle/tickle'
 require 'tickle/handler'
 require 'tickle/repeater'
 
+# Tickle is a natural language parser for recurring events.
 module Tickle
 
   def self.debug=(val); @debug = val; end
