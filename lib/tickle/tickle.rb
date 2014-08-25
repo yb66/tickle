@@ -23,8 +23,12 @@ module Tickle
   class << self
     # == Configuration options
     #
-    # param [Date,String] start Start date for future occurrences.  Must be in valid date format.
-    # param [Date,String] until Last date to run occurrences until.  Must be in valid date format.
+    # @param [String] text The string Tickle should parse.
+    # @param [Hash] specified_options See actual defaults below.
+    # @option specified_options [Date,Time,String] :start (Time.now) Start date for future occurrences.  Must be in valid date format.
+    # @option specified_options [Date,Time,String] :until (nil) Last date to run occurrences until. Must be in valid date format.
+    # @option specified_options [true,false] :next_only (false)
+    # @option specified_options [Date,Time] :now (Time.now)
     # @return [Hash]
     #
     #  @example Use by calling Tickle.parse and passing natural language with or without options.
