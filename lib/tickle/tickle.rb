@@ -23,15 +23,13 @@ module Tickle
   class << self
     # == Configuration options
     #
-    # * +start+ - start date for future occurrences.  Must be in valid date format.
-    # * +until+ - last date to run occurrences until.  Must be in valid date format.
+    # param [Date,String] start Start date for future occurrences.  Must be in valid date format.
+    # param [Date,String] until Last date to run occurrences until.  Must be in valid date format.
+    # @return [Hash]
     #
-    #  Use by calling Tickle.parse and passing natural language with or without options.
-    #
-    #  def get_next_occurrence
-    #      results = Tickle.parse('every Wednesday starting June 1st until Dec 15th')
-    #      return results[:next] if results
-    #  end
+    #  @example Use by calling Tickle.parse and passing natural language with or without options.
+    #    Tickle.parse("every Tuesday")
+    #    # => {:next=>2014-08-26 12:00:00 0100, :expression=>"tuesday", :starting=>2014-08-25 16:31:12 0100, :until=>nil}
     #
     def parse(text, specified_options = {})
       # get options and set defaults if necessary.  Ability to set now is mostly for debugging
