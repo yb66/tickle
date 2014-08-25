@@ -39,13 +39,13 @@ module Tickle
       options = default_options.merge specified_options
 
       # ensure an expression was provided
-      raise(InvalidArgumentException, 'date expression is required') unless text
+      fail(InvalidArgumentException, 'date expression is required') unless text
 
       # ensure the specified options are valid
       specified_options.keys.each do |key|
-        raise(InvalidArgumentException, "#{key} is not a valid option key.") unless default_options.keys.include?(key)
+        fail(InvalidArgumentException, "#{key} is not a valid option key.") unless default_options.keys.include?(key)
       end
-      raise(InvalidArgumentException, ':start specified is not a valid datetime.') unless  (is_date(specified_options[:start]) || Chronic.parse(specified_options[:start])) if specified_options[:start]
+      fail(InvalidArgumentException, ':start specified is not a valid datetime.') unless  (is_date(specified_options[:start]) || Chronic.parse(specified_options[:start])) if specified_options[:start]
 
       # check to see if a valid datetime was passed
       return text if text.is_a?(Date) ||  text.is_a?(Time)
@@ -56,8 +56,8 @@ module Tickle
       Tickle.dwrite("start: #{@start}, until: #{@until}, now: #{options[:now].to_date}")
 
       # => ** this is mostly for testing. Bump by 1 day if today (or in the past for testing)
-      raise(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur in the past for a future event") if @start && @start.to_date < Date.today
-      raise(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur after the end date") if @until && @start.to_date > @until.to_date
+      fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur in the past for a future event") if @start && @start.to_date < Date.today
+      fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur after the end date") if @until && @start.to_date > @until.to_date
 
       # no need to guess at expression if the start_date is in the future
       best_guess = nil
@@ -90,7 +90,7 @@ module Tickle
         best_guess = (guess || chronic_parse(event))
       end
 
-      raise(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
+      fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
 
       if !best_guess
         return nil
@@ -131,7 +131,7 @@ module Tickle
         if @start
           @start.to_time
         else
-          raise(InvalidDateExpression,"the starting date expression \"#{starting}\" could not be interpretted")
+          fail(InvalidDateExpression,"the starting date expression \"#{starting}\" could not be interpretted")
         end
       else
         @start = options[:start].to_time rescue nil
@@ -142,7 +142,7 @@ module Tickle
         if @until
           @until.to_time
         else
-          raise(InvalidDateExpression,"the ending date expression \"#{ending}\" could not be interpretted")
+          fail(InvalidDateExpression,"the ending date expression \"#{ending}\" could not be interpretted")
         end
       else
         @until = options[:until].to_time rescue nil
