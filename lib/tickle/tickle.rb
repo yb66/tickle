@@ -44,11 +44,6 @@ module Tickle
           |
         repeat
       )
-      (?:
-        s
-          |
-        ing
-      )?
     )
     (?<target>.*)
   /ix
