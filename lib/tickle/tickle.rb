@@ -219,7 +219,23 @@ module Tickle
 
     # process the remaining expression to see if an until, end, ending is specified
     def process_for_ending(text)
-      regex = /^(.*)(\s(?:\bend|until)(?:s|ing)?)(.*)/i
+      regex = /^
+        (.*)
+        (
+          \s+
+          (?:
+            \bend
+              |
+            until
+          )
+          (?:
+            s
+              |
+            ing
+          )?
+        )
+        (.*)
+      /ix
       if text =~ regex
         return text.match(regex)[1], text.match(regex)[3]
       else
