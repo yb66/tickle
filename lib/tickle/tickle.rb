@@ -86,6 +86,16 @@ module Tickle
       (?<finish>.*)
     /ix
 
+    PROCESS_FOR_ENDING = /^
+      (.*)
+      (
+        \s+
+        (?: #{END_OR_UNTIL})
+        (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
+      )
+      (.*)
+    /ix
+
   end
 
 
@@ -221,21 +231,9 @@ module Tickle
 
     # process the remaining expression to see if an until, end, ending is specified
     def process_for_ending(text)
-      regex = /^
-        (.*)
-        (
-          \s+
-          (?: #{Patterns::END_OR_UNTIL})
-          (?:
-            s
-              |
-            ing
-          )?
-        )
-        (.*)
-      /ix
-      if text =~ regex
-        return text.match(regex)[1], text.match(regex)[3]
+      
+      if text =~ Patterns::PROCESS_FOR_ENDING
+        return text.match(Patterns::PROCESS_FOR_ENDING)[1], text.match(Patterns::PROCESS_FOR_ENDING)[3]
       else
         return text, nil
       end
