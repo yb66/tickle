@@ -178,20 +178,21 @@ module Tickle
     # scans the expression for a variety of natural formats, such as 'every thursday starting tomorrow until May 15th
     def scan_expression(text, options)
       starting = ending = nil
-      if text =~ START_EVERY_REGEX
-        starting = text.match(START_EVERY_REGEX)[2].strip
-        text = text.match(START_EVERY_REGEX)[4].strip
-        event, ending = process_for_ending(text)
-      elsif text =~ EVERY_START_REGEX
-        event = text.match(EVERY_START_REGEX)[2].strip
-        text = text.match(EVERY_START_REGEX)[4].strip
-        starting, ending = process_for_ending(text)
-      elsif text =~ START_ENDING_REGEX
-        starting = text.match(START_ENDING_REGEX)[2].strip
-        ending = text.match(START_ENDING_REGEX)[4].strip
-        event = 'day'
-      else
-        event, ending = process_for_ending(text)
+      case text
+        when START_EVERY_REGEX
+          starting = text.match(START_EVERY_REGEX)[2].strip
+          text = text.match(START_EVERY_REGEX)[4].strip
+          event, ending = process_for_ending(text)
+        when EVERY_START_REGEX
+          event = text.match(EVERY_START_REGEX)[2].strip
+          text = text.match(EVERY_START_REGEX)[4].strip
+          starting, ending = process_for_ending(text)
+        when START_ENDING_REGEX
+          starting = text.match(START_ENDING_REGEX)[2].strip
+          ending = text.match(START_ENDING_REGEX)[4].strip
+          event = 'day'
+        else
+          event, ending = process_for_ending(text)
       end
 
       # they gave a phrase so if we can't interpret then we need to raise an error
