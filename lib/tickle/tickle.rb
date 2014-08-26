@@ -101,24 +101,94 @@ module Tickle
       end
     end
 
+
+    START_EVERY_REGEX = /^
+      (
+        start
+        (?:
+          s
+            |
+          ing
+        )?
+      )
+      \s
+      (.*)
+      (\s
+        (?:
+          every
+            |
+          each
+            |
+          \bon\b
+            |
+          repeat
+        )
+        (?:
+          s
+            |
+          ing
+        )?
+      )
+      (.*)
+    /ix
+
+    EVERY_START_REGEX = /^
+      (
+        every
+          |
+        each
+          |
+        \bon\b
+          |
+        repeat(?:the)?
+      )
+      \s
+      (.*)
+      (\s
+        (?:start)
+        (?:
+          s
+            |
+          ing
+        )?
+      )(.*)
+    /ix
+
+    START_ENDING_REGEX = /^
+      (start
+        (?:s|ing)?
+      )
+      \s
+      (.*)
+      (\s
+        (?:
+          \bend
+            |
+          until
+        )
+        (?:
+          s
+            |
+          ing
+        )?
+      )
+      (.*)
+    /ix
+
     # scans the expression for a variety of natural formats, such as 'every thursday starting tomorrow until May 15th
     def scan_expression(text, options)
       starting = ending = nil
-
-      start_every_regex = /^(start(?:s|ing)?)\s(.*)(\s(?:every|each|\bon\b|repeat)(?:s|ing)?)(.*)/i
-      every_start_regex = /^(every|each|\bon\b|repeat(?:the)?)\s(.*)(\s(?:start)(?:s|ing)?)(.*)/i
-      start_ending_regex = /^(start(?:s|ing)?)\s(.*)(\s(?:\bend|until)(?:s|ing)?)(.*)/i
-      if text =~ start_every_regex
-        starting = text.match(start_every_regex)[2].strip
-        text = text.match(start_every_regex)[4].strip
+      if text =~ START_EVERY_REGEX
+        starting = text.match(START_EVERY_REGEX)[2].strip
+        text = text.match(START_EVERY_REGEX)[4].strip
         event, ending = process_for_ending(text)
-      elsif text =~ every_start_regex
-        event = text.match(every_start_regex)[2].strip
-        text = text.match(every_start_regex)[4].strip
+      elsif text =~ EVERY_START_REGEX
+        event = text.match(EVERY_START_REGEX)[2].strip
+        text = text.match(EVERY_START_REGEX)[4].strip
         starting, ending = process_for_ending(text)
-      elsif text =~ start_ending_regex
-        starting = text.match(start_ending_regex)[2].strip
-        ending = text.match(start_ending_regex)[4].strip
+      elsif text =~ START_ENDING_REGEX
+        starting = text.match(START_ENDING_REGEX)[2].strip
+        ending = text.match(START_ENDING_REGEX)[4].strip
         event = 'day'
       else
         event, ending = process_for_ending(text)
