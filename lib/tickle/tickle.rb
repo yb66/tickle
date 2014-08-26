@@ -180,6 +180,7 @@ module Tickle
       end
     end
 
+
     # scans the expression for a variety of natural formats, such as 'every thursday starting tomorrow until May 15th
     def scan_expression(text, options)
       starting = ending = nil
@@ -229,6 +230,7 @@ module Tickle
       return event
     end
 
+
     # process the remaining expression to see if an until, end, ending is specified
     def process_for_ending(text)
       if text =~ Patterns::PROCESS_FOR_ENDING
@@ -237,6 +239,7 @@ module Tickle
         return text, nil
       end
     end
+
 
     # Normalize natural string removing prefix language
     def pre_filter(text)
@@ -251,11 +254,13 @@ module Tickle
       text = normalize_us_holidays(text)
     end
 
+
     # Split the text on spaces and convert each word into
     # a Token
     def base_tokenize(text) #:nodoc:
       text.split(' ').map { |word| Token.new(word) }
     end
+
 
     # normalizes each token
     def post_tokenize
@@ -310,6 +315,7 @@ module Tickle
       normalized_text
     end
 
+
     # Turns compound numbers, like 'twenty first' => 21
     def combine_multiple_numbers
       if [:number, :ordinal].all? {|type| token_types.include? type}
@@ -324,10 +330,12 @@ module Tickle
       end
     end
 
+
     # Returns an array of types for all tokens
     def token_types
       @tokens.map(&:type)
     end
+
 
     # Returns the next available month based on the current day of the month.
     # For example, if get_next_month(15) is called and the start date is the 10th, then it will return the 15th of this month.
@@ -336,10 +344,12 @@ module Tickle
       month = number.to_i < @start.day ? (@start.month == 12 ? 1 : @start.month + 1) : @start.month
     end
 
+
     def next_appropriate_year(month, day)
       year = (Date.new(@start.year.to_i, month.to_i, day.to_i) == @start.to_date) ? @start.year + 1 : @start.year
       return year
     end
+
 
     # Return the number of days in a specified month.
     # If no month is specified, current month is used.
@@ -348,7 +358,9 @@ module Tickle
       days_in_mon = Date.civil(Date.today.year, month, -1).day
     end
 
+
     private
+
 
     # slightly modified chronic parser to ensure that the date found is in the future
     # first we check to see if an explicit date was passed and, if so, dont do anything.
@@ -362,8 +374,10 @@ module Tickle
 
   end
 
+
   class Token #:nodoc:
     attr_accessor :original, :word, :type, :interval, :start
+
 
     def initialize(original, word=nil, type=nil, start=nil, interval=nil)
       @original = original
@@ -373,6 +387,7 @@ module Tickle
       @start = start
     end
 
+
     # Updates an existing token.  Mostly used by the repeater class.
     def update(type, start=nil, interval=nil)
       @start = start
@@ -381,10 +396,12 @@ module Tickle
     end
   end
 
+
   # This exception is raised if an invalid argument is provided to
   # any of Tickle's methods
   class InvalidArgumentException < Exception
   end
+
 
   # This exception is raised if there is an issue with the parsing
   # output from the date expression provided
