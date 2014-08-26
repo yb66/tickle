@@ -87,13 +87,13 @@ module Tickle
     /ix
 
     PROCESS_FOR_ENDING = /^
-      (.*)
+      (?<event>.*)
       (
         \s+
         (?: #{END_OR_UNTIL})
         (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
       )
-      (.*)
+      (?<ending>.*)
     /ix
 
   end
@@ -233,7 +233,7 @@ module Tickle
     def process_for_ending(text)
       
       if text =~ Patterns::PROCESS_FOR_ENDING
-        return text.match(Patterns::PROCESS_FOR_ENDING)[1], text.match(Patterns::PROCESS_FOR_ENDING)[3]
+        return text.match(Patterns::PROCESS_FOR_ENDING)[:event], text.match(Patterns::PROCESS_FOR_ENDING)[:ending]
       else
         return text, nil
       end
