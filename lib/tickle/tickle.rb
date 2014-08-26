@@ -47,10 +47,10 @@ module Tickle
     (?:
       #{START}
     )
-    \s
+    \s+
     (?<start>.*)
     (?:
-      \s
+      \s+
       (?: #{SET_IDENTIFIER} )
     )
     (?<target>.*)
@@ -59,9 +59,10 @@ module Tickle
 
     EVERY_START_REGEX = /^
       (?: #{SET_IDENTIFIER} )
-      \s
+      \s+
       (?<target>.*)
-      (?:\s
+      (?:
+        \s+
         #{START}
       )
       (?<start>.*)
@@ -69,10 +70,10 @@ module Tickle
 
     START_ENDING_REGEX = /^
       (?: #{START} )
-      \s
+      \s+
       (?<start>.*)
       (?:
-        \s
+        \s+
         (?:
           \bend
             |
