@@ -37,7 +37,7 @@ module Tickle
         |
       repeat
     /x
-        
+  
     PLURAL_OR_PRESENT_PARTICIPLE = /
         s
           |
@@ -231,7 +231,6 @@ module Tickle
 
     # process the remaining expression to see if an until, end, ending is specified
     def process_for_ending(text)
-      
       if text =~ Patterns::PROCESS_FOR_ENDING
         return text.match(Patterns::PROCESS_FOR_ENDING)[:event], text.match(Patterns::PROCESS_FOR_ENDING)[:ending]
       else
