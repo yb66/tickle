@@ -4,67 +4,69 @@ require 'spec_helper'
 require_relative "../lib/tickle.rb"
 require 'timecop'
 
+module Tickle # for convenience
+
 tz = ENV["TZ"]
 time_now = Time.parse "2010-05-09 20:57:36 +0000"
 
 describe "Parsing" do
 
-  describe "Regex" do
+  describe "Patterns" do
     let(:example1) { "every thursday starting tomorrow until May 15th" }
     let(:example2) { "starting thursday every Tuesday until May 15th" }
     let(:example3) { "every thursday starting tomorrow until May 15th" }
     let(:example4) { "starting thursday on the 5th day of each month until May 15th" }
     describe "START_EVERY_REGEX" do
       context "Given example1" do
-        subject { Tickle::START_EVERY_REGEX.match example1 }
+        subject { Patterns::START_EVERY_REGEX.match example1 }
         it { should be_nil }
       end
       context "Given example2" do
-        subject { Tickle::START_EVERY_REGEX.match example2 }
+        subject { Patterns::START_EVERY_REGEX.match example2 }
         it { should_not be_nil }
       end
       context "Given example3" do
-        subject { Tickle::START_EVERY_REGEX.match example3 }
+        subject { Patterns::START_EVERY_REGEX.match example3 }
         it { should be_nil }
       end
       context "Given example4" do
-        subject { Tickle::START_EVERY_REGEX.match example4 }
+        subject { Patterns::START_EVERY_REGEX.match example4 }
         it { should_not be_nil }
       end
     end
     describe "EVERY_START_REGEX" do
       context "Given example1" do
-        subject { Tickle::EVERY_START_REGEX.match example1 }
+        subject { Patterns::EVERY_START_REGEX.match example1 }
         it { should_not be_nil }
       end
       context "Given example2" do
-        subject { Tickle::EVERY_START_REGEX.match example2 }
+        subject { Patterns::EVERY_START_REGEX.match example2 }
         it { should be_nil }
       end
       context "Given example3" do
-        subject { Tickle::EVERY_START_REGEX.match example3 }
+        subject { Patterns::EVERY_START_REGEX.match example3 }
         it { should_not be_nil }
       end
       context "Given example4" do
-        subject { Tickle::EVERY_START_REGEX.match example4 }
+        subject { Patterns::EVERY_START_REGEX.match example4 }
         it { should be_nil }
       end
     end
     describe "START_ENDING_REGEX" do
       context "Given example1" do
-        subject { Tickle::START_ENDING_REGEX.match example1 }
+        subject { Patterns::START_ENDING_REGEX.match example1 }
         it { should be_nil }
       end
       context "Given example2" do
-        subject { Tickle::START_ENDING_REGEX.match example2 }
+        subject { Patterns::START_ENDING_REGEX.match example2 }
         it { should_not be_nil }
       end
       context "Given example3" do
-        subject { Tickle::START_ENDING_REGEX.match example3 }
+        subject { Patterns::START_ENDING_REGEX.match example3 }
         it { should be_nil }
       end
       context "Given example4" do
-        subject { Tickle::START_ENDING_REGEX.match example4 }
+        subject { Patterns::START_ENDING_REGEX.match example4 }
         it { should_not be_nil }
       end
     end
@@ -496,3 +498,5 @@ describe "Parsing" do
     end
   end
 end
+
+end # of module

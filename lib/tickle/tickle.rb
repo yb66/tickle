@@ -21,15 +21,19 @@
 
 module Tickle
 
-
-  START_EVERY_REGEX = /^
-    (?:
+  module Patterns
+    START = /
       start
       (?:
         s
           |
         ing
       )?
+    /x
+
+    START_EVERY_REGEX = /^
+    (?:
+      #{START}
     )
     \s
     (?<start>.*)
@@ -48,54 +52,58 @@ module Tickle
     (?<target>.*)
   /ix
 
-  EVERY_START_REGEX = /^
-    (?:
-      every
-        |
-      each
-        |
-      \bon\b
-        |
-      repeat(?:the)?
-    )
-    \s
-    (?<target>.*)
-    (?:\s
-      (?:start)
-      (?:
-        s
-          |
-        ing
-      )?
-    )(?<start>.*)
-  /ix
 
-  START_ENDING_REGEX = /^
-    (?:
-      start
+    EVERY_START_REGEX = /^
       (?:
-        s
+        every
           |
-        ing
-      )?
-    )
-    \s
-    (?<start>.*)
-    (?:
-      \s
-      (?:
-        \bend
+        each
           |
-        until
+        \bon\b
+          |
+        repeat(?:the)?
       )
+      \s
+      (?<target>.*)
+      (?:\s
+        (?:start)
+        (?:
+          s
+            |
+          ing
+        )?
+      )(?<start>.*)
+    /ix
+
+    START_ENDING_REGEX = /^
       (?:
-        s
-          |
-        ing
-      )?
-    )
-    (?<finish>.*)
-  /ix
+        start
+        (?:
+          s
+            |
+          ing
+        )?
+      )
+      \s
+      (?<start>.*)
+      (?:
+        \s
+        (?:
+          \bend
+            |
+          until
+        )
+        (?:
+          s
+            |
+          ing
+        )?
+      )
+      (?<finish>.*)
+    /ix
+
+  end
+
 
   class << self
     # == Configuration options
@@ -182,17 +190,17 @@ module Tickle
     def scan_expression(text, options)
       starting = ending = nil
       case text
-        when START_EVERY_REGEX
-          starting = text.match(START_EVERY_REGEX)[:start].strip
-          text = text.match(START_EVERY_REGEX)[:target].strip
+        when Patterns::START_EVERY_REGEX
+          starting = text.match(Patterns::START_EVERY_REGEX)[:start].strip
+          text = text.match(Patterns::START_EVERY_REGEX)[:target].strip
           event, ending = process_for_ending(text)
-        when EVERY_START_REGEX
-          event = text.match(EVERY_START_REGEX)[:target].strip
-          text = text.match(EVERY_START_REGEX)[:start].strip
+        when Patterns::EVERY_START_REGEX
+          event = text.match(Patterns::EVERY_START_REGEX)[:target].strip
+          text = text.match(Patterns::EVERY_START_REGEX)[:start].strip
           starting, ending = process_for_ending(text)
-        when START_ENDING_REGEX
-          starting = text.match(START_ENDING_REGEX)[:start].strip
-          ending = text.match(START_ENDING_REGEX)[:finish].strip
+        when Patterns::START_ENDING_REGEX
+          starting = text.match(Patterns::START_ENDING_REGEX)[:start].strip
+          ending = text.match(Patterns::START_ENDING_REGEX)[:finish].strip
           event = 'day'
         else
           event, ending = process_for_ending(text)
