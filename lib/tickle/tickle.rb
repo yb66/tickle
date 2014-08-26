@@ -20,6 +20,85 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Tickle
+
+  module Patterns
+    END_OR_UNTIL  = /
+      \bend
+        |
+      until
+    /x
+
+    SET_IDENTIFIER = /
+      every
+        |
+      each
+        |
+      \bon(?:\s+the)?\b
+        |
+      repeat
+    /x
+  
+    PLURAL_OR_PRESENT_PARTICIPLE = /
+        s
+          |
+        ing
+    /x
+
+    START = /
+      start
+      (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
+    /x
+
+    START_EVERY_REGEX = /^
+    (?:
+      #{START}
+    )
+    \s+
+    (?<start>.*)
+    (?:
+      \s+
+      (?: #{SET_IDENTIFIER} )
+    )
+    (?<target>.*)
+  /ix
+
+
+    EVERY_START_REGEX = /^
+      (?: #{SET_IDENTIFIER} )
+      \s+
+      (?<target>.*)
+      (?:
+        \s+
+        #{START}
+      )
+      (?<start>.*)
+    /ix
+
+    START_ENDING_REGEX = /^
+      (?: #{START} )
+      \s+
+      (?<start>.*)
+      (?:
+        \s+
+        (?: #{END_OR_UNTIL} )
+        (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
+      )
+      (?<finish>.*)
+    /ix
+
+    PROCESS_FOR_ENDING = /^
+      (?<event>.*)
+      (
+        \s+
+        (?: #{END_OR_UNTIL})
+        (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
+      )
+      (?<ending>.*)
+    /ix
+
+  end
+
+
   class << self
     # == Configuration options
     #
@@ -41,13 +120,13 @@ module Tickle
       options = default_options.merge specified_options
 
       # ensure an expression was provided
-      raise(InvalidArgumentException, 'date expression is required') unless text
+      fail(ArgumentError, 'date expression is required') unless text
 
       # ensure the specified options are valid
       specified_options.keys.each do |key|
-        raise(InvalidArgumentException, "#{key} is not a valid option key.") unless default_options.keys.include?(key)
+        fail(ArgumentError, "#{key} is not a valid option key.") unless default_options.keys.include?(key)
       end
-      raise(InvalidArgumentException, ':start specified is not a valid datetime.') unless  (is_date(specified_options[:start]) || Chronic.parse(specified_options[:start])) if specified_options[:start]
+      fail(ArgumentError, ':start specified is not a valid datetime.') unless  (is_date(specified_options[:start]) || Chronic.parse(specified_options[:start])) if specified_options[:start]
 
       # check to see if a valid datetime was passed
       return text if text.is_a?(Date) ||  text.is_a?(Time)
@@ -58,8 +137,8 @@ module Tickle
       Tickle.dwrite("start: #{@start}, until: #{@until}, now: #{options[:now].to_date}")
 
       # => ** this is mostly for testing. Bump by 1 day if today (or in the past for testing)
-      raise(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur in the past for a future event") if @start && @start.to_date < Date.today
-      raise(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur after the end date") if @until && @start.to_date > @until.to_date
+      fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur in the past for a future event") if @start && @start.to_date < Date.today
+      fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur after the end date") if @until && @start.to_date > @until.to_date
 
       # no need to guess at expression if the start_date is in the future
       best_guess = nil
@@ -92,7 +171,7 @@ module Tickle
         best_guess = (guess || chronic_parse(event))
       end
 
-      raise(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
+      fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
 
       if !best_guess
         return nil
@@ -103,27 +182,25 @@ module Tickle
       end
     end
 
+
     # scans the expression for a variety of natural formats, such as 'every thursday starting tomorrow until May 15th
     def scan_expression(text, options)
       starting = ending = nil
-
-      start_every_regex = /^(start(?:s|ing)?)\s(.*)(\s(?:every|each|\bon\b|repeat)(?:s|ing)?)(.*)/i
-      every_start_regex = /^(every|each|\bon\b|repeat(?:the)?)\s(.*)(\s(?:start)(?:s|ing)?)(.*)/i
-      start_ending_regex = /^(start(?:s|ing)?)\s(.*)(\s(?:\bend|until)(?:s|ing)?)(.*)/i
-      if text =~ start_every_regex
-        starting = text.match(start_every_regex)[2].strip
-        text = text.match(start_every_regex)[4].strip
-        event, ending = process_for_ending(text)
-      elsif text =~ every_start_regex
-        event = text.match(every_start_regex)[2].strip
-        text = text.match(every_start_regex)[4].strip
-        starting, ending = process_for_ending(text)
-      elsif text =~ start_ending_regex
-        starting = text.match(start_ending_regex)[2].strip
-        ending = text.match(start_ending_regex)[4].strip
-        event = 'day'
-      else
-        event, ending = process_for_ending(text)
+      case text
+        when Patterns::START_EVERY_REGEX
+          starting = text.match(Patterns::START_EVERY_REGEX)[:start].strip
+          text = text.match(Patterns::START_EVERY_REGEX)[:target].strip
+          event, ending = process_for_ending(text)
+        when Patterns::EVERY_START_REGEX
+          event = text.match(Patterns::EVERY_START_REGEX)[:target].strip
+          text = text.match(Patterns::EVERY_START_REGEX)[:start].strip
+          starting, ending = process_for_ending(text)
+        when Patterns::START_ENDING_REGEX
+          starting = text.match(Patterns::START_ENDING_REGEX)[:start].strip
+          ending = text.match(Patterns::START_ENDING_REGEX)[:finish].strip
+          event = 'day'
+        else
+          event, ending = process_for_ending(text)
       end
 
       # they gave a phrase so if we can't interpret then we need to raise an error
@@ -133,7 +210,7 @@ module Tickle
         if @start
           @start.to_time
         else
-          raise(InvalidDateExpression,"the starting date expression \"#{starting}\" could not be interpretted")
+          fail(InvalidDateExpression,"the starting date expression \"#{starting}\" could not be interpretted")
         end
       else
         @start = options[:start].to_time rescue nil
@@ -144,7 +221,7 @@ module Tickle
         if @until
           @until.to_time
         else
-          raise(InvalidDateExpression,"the ending date expression \"#{ending}\" could not be interpretted")
+          fail(InvalidDateExpression,"the ending date expression \"#{ending}\" could not be interpretted")
         end
       else
         @until = options[:until].to_time rescue nil
@@ -155,15 +232,16 @@ module Tickle
       return event
     end
 
+
     # process the remaining expression to see if an until, end, ending is specified
     def process_for_ending(text)
-      regex = /^(.*)(\s(?:\bend|until)(?:s|ing)?)(.*)/i
-      if text =~ regex
-        return text.match(regex)[1], text.match(regex)[3]
+      if text =~ Patterns::PROCESS_FOR_ENDING
+        return text.match(Patterns::PROCESS_FOR_ENDING)[:event], text.match(Patterns::PROCESS_FOR_ENDING)[:ending]
       else
         return text, nil
       end
     end
+
 
     # Normalize natural string removing prefix language
     def pre_filter(text)
@@ -178,11 +256,13 @@ module Tickle
       text = normalize_us_holidays(text)
     end
 
+
     # Split the text on spaces and convert each word into
     # a Token
     def base_tokenize(text)
       text.split(' ').map { |word| Token.new(word) }
     end
+
 
     # normalizes each token
     def post_tokenize
@@ -237,6 +317,7 @@ module Tickle
       normalized_text
     end
 
+
     # Turns compound numbers, like 'twenty first' => 21
     def combine_multiple_numbers
       if [:number, :ordinal].all? {|type| token_types.include? type}
@@ -251,10 +332,12 @@ module Tickle
       end
     end
 
+
     # Returns an array of types for all tokens
     def token_types
       @tokens.map(&:type)
     end
+
 
     # Returns the next available month based on the current day of the month.
     # For example, if get_next_month(15) is called and the start date is the 10th, then it will return the 15th of this month.
@@ -263,10 +346,12 @@ module Tickle
       month = number.to_i < @start.day ? (@start.month == 12 ? 1 : @start.month + 1) : @start.month
     end
 
+
     def next_appropriate_year(month, day)
       year = (Date.new(@start.year.to_i, month.to_i, day.to_i) == @start.to_date) ? @start.year + 1 : @start.year
       return year
     end
+
 
     # Return the number of days in a specified month.
     # If no month is specified, current month is used.
@@ -275,7 +360,9 @@ module Tickle
       days_in_mon = Date.civil(Date.today.year, month, -1).day
     end
 
+
     private
+
 
     # slightly modified chronic parser to ensure that the date found is in the future
     # first we check to see if an explicit date was passed and, if so, dont do anything.
@@ -289,8 +376,10 @@ module Tickle
 
   end
 
+
   class Token
     attr_accessor :original, :word, :type, :interval, :start
+
 
     def initialize(original, word=nil, type=nil, start=nil, interval=nil)
       @original = original
@@ -300,6 +389,7 @@ module Tickle
       @start = start
     end
 
+
     # Updates an existing token.  Mostly used by the repeater class.
     def update(type, start=nil, interval=nil)
       @start = start
@@ -308,10 +398,6 @@ module Tickle
     end
   end
 
-  # This exception is raised if an invalid argument is provided to
-  # any of Tickle's methods
-  class InvalidArgumentException < Exception
-  end
 
   # This exception is raised if there is an issue with the parsing
   # output from the date expression provided
