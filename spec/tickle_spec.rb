@@ -10,18 +10,37 @@ time_now = Time.parse "2010-05-09 20:57:36 +0000"
 describe "Parsing" do
 
   describe "Regex" do
-    let(:example) { "every thursday starting tomorrow until May 15th" }
+    let(:example1) { "every thursday starting tomorrow until May 15th" }
+    let(:example2) { "starting thursday every Tuesday until May 15th" }
     describe "START_EVERY_REGEX" do
-      subject { Tickle::START_EVERY_REGEX.match example }
-      it { should_not be_nil }
+      context "Given example1" do
+        subject { Tickle::START_EVERY_REGEX.match example1 }
+        it { should be_nil }
+      end
+      context "Given example2" do
+        subject { Tickle::START_EVERY_REGEX.match example2 }
+        it { should_not be_nil }
+      end
     end
     describe "EVERY_START_REGEX" do
-      subject { Tickle::EVERY_START_REGEX.match example }
-      it { should_not be_nil }
+      context "Given example1" do
+        subject { Tickle::EVERY_START_REGEX.match example1 }
+        it { should_not be_nil }
+      end
+      context "Given example2" do
+        subject { Tickle::EVERY_START_REGEX.match example2 }
+        it { should be_nil }
+      end
     end
     describe "START_ENDING_REGEX" do
-      subject { Tickle::START_ENDING_REGEX.match example }
-      it { should_not be_nil }
+      context "Given example1" do
+        subject { Tickle::START_ENDING_REGEX.match example1 }
+        it { should be_nil }
+      end
+      context "Given example2" do
+        subject { Tickle::START_ENDING_REGEX.match example2 }
+        it { should_not be_nil }
+      end
     end
   end
 
