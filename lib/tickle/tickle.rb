@@ -40,7 +40,7 @@ module Tickle
           |
         each
           |
-        \bon\b
+        \bon(?:\s+the)?\b
           |
         repeat
       )

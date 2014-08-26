@@ -12,6 +12,8 @@ describe "Parsing" do
   describe "Regex" do
     let(:example1) { "every thursday starting tomorrow until May 15th" }
     let(:example2) { "starting thursday every Tuesday until May 15th" }
+    let(:example3) { "every thursday starting tomorrow until May 15th" }
+    let(:example4) { "starting thursday on the 5th day of each month until May 15th" }
     describe "START_EVERY_REGEX" do
       context "Given example1" do
         subject { Tickle::START_EVERY_REGEX.match example1 }
@@ -19,6 +21,14 @@ describe "Parsing" do
       end
       context "Given example2" do
         subject { Tickle::START_EVERY_REGEX.match example2 }
+        it { should_not be_nil }
+      end
+      context "Given example3" do
+        subject { Tickle::START_EVERY_REGEX.match example3 }
+        it { should be_nil }
+      end
+      context "Given example4" do
+        subject { Tickle::START_EVERY_REGEX.match example4 }
         it { should_not be_nil }
       end
     end
@@ -31,6 +41,14 @@ describe "Parsing" do
         subject { Tickle::EVERY_START_REGEX.match example2 }
         it { should be_nil }
       end
+      context "Given example3" do
+        subject { Tickle::EVERY_START_REGEX.match example3 }
+        it { should_not be_nil }
+      end
+      context "Given example4" do
+        subject { Tickle::EVERY_START_REGEX.match example4 }
+        it { should be_nil }
+      end
     end
     describe "START_ENDING_REGEX" do
       context "Given example1" do
@@ -39,6 +57,14 @@ describe "Parsing" do
       end
       context "Given example2" do
         subject { Tickle::START_ENDING_REGEX.match example2 }
+        it { should_not be_nil }
+      end
+      context "Given example3" do
+        subject { Tickle::START_ENDING_REGEX.match example3 }
+        it { should be_nil }
+      end
+      context "Given example4" do
+        subject { Tickle::START_ENDING_REGEX.match example4 }
         it { should_not be_nil }
       end
     end
