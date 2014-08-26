@@ -12,6 +12,5 @@ group :test do
   gem "rspec"
   gem "timecop"
   gem "simplecov"
-  gem "shoulda", "~> 2.10.3"
   gem "rake"
 end
