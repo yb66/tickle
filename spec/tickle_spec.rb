@@ -10,7 +10,15 @@ time_now = Time.parse "2010-05-09 20:57:36 +0000"
 describe "Parsing" do
 
   describe "Regex" do
-    pending
+    describe "START_EVERY_REGEX" do
+      pending
+    end
+    describe "EVERY_START_REGEX" do
+      pending
+    end
+    describe "START_ENDING_REGEX" do
+      pending
+    end
   end
 
   describe "parse", :integration => true do
