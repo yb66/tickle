@@ -20,6 +20,81 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Tickle
+
+
+  START_EVERY_REGEX = /^
+    (
+      start
+      (?:
+        s
+          |
+        ing
+      )?
+    )
+    \s
+    (.*)
+    (\s
+      (?:
+        every
+          |
+        each
+          |
+        \bon\b
+          |
+        repeat
+      )
+      (?:
+        s
+          |
+        ing
+      )?
+    )
+    (.*)
+  /ix
+
+  EVERY_START_REGEX = /^
+    (
+      every
+        |
+      each
+        |
+      \bon\b
+        |
+      repeat(?:the)?
+    )
+    \s
+    (.*)
+    (\s
+      (?:start)
+      (?:
+        s
+          |
+        ing
+      )?
+    )(.*)
+  /ix
+
+  START_ENDING_REGEX = /^
+    (start
+      (?:s|ing)?
+    )
+    \s
+    (.*)
+    (\s
+      (?:
+        \bend
+          |
+        until
+      )
+      (?:
+        s
+          |
+        ing
+      )?
+    )
+    (.*)
+  /ix
+
   class << self
     # == Configuration options
     #
@@ -100,80 +175,6 @@ module Tickle
         return best_guess
       end
     end
-
-
-    START_EVERY_REGEX = /^
-      (
-        start
-        (?:
-          s
-            |
-          ing
-        )?
-      )
-      \s
-      (.*)
-      (\s
-        (?:
-          every
-            |
-          each
-            |
-          \bon\b
-            |
-          repeat
-        )
-        (?:
-          s
-            |
-          ing
-        )?
-      )
-      (.*)
-    /ix
-
-    EVERY_START_REGEX = /^
-      (
-        every
-          |
-        each
-          |
-        \bon\b
-          |
-        repeat(?:the)?
-      )
-      \s
-      (.*)
-      (\s
-        (?:start)
-        (?:
-          s
-            |
-          ing
-        )?
-      )(.*)
-    /ix
-
-    START_ENDING_REGEX = /^
-      (start
-        (?:s|ing)?
-      )
-      \s
-      (.*)
-      (\s
-        (?:
-          \bend
-            |
-          until
-        )
-        (?:
-          s
-            |
-          ing
-        )?
-      )
-      (.*)
-    /ix
 
     # scans the expression for a variety of natural formats, such as 'every thursday starting tomorrow until May 15th
     def scan_expression(text, options)
