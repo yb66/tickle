@@ -22,13 +22,25 @@
 module Tickle
 
   module Patterns
-    START = /
-      start
-      (?:
+    SET_IDENTIFIER = /
+      every
+        |
+      each
+        |
+      \bon(?:\s+the)?\b
+        |
+      repeat
+    /x
+        
+    PLURAL_OR_PRESENT_PARTICIPLE = /
         s
           |
         ing
-      )?
+    /x
+
+    START = /
+      start
+      (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
     /x
 
     START_EVERY_REGEX = /^
@@ -39,51 +51,24 @@ module Tickle
     (?<start>.*)
     (?:
       \s
-      (?:
-        every
-          |
-        each
-          |
-        \bon(?:\s+the)?\b
-          |
-        repeat
-      )
+      (?: #{SET_IDENTIFIER} )
     )
     (?<target>.*)
   /ix
 
 
     EVERY_START_REGEX = /^
-      (?:
-        every
-          |
-        each
-          |
-        \bon\b
-          |
-        repeat(?:the)?
-      )
+      (?: #{SET_IDENTIFIER} )
       \s
       (?<target>.*)
       (?:\s
-        (?:start)
-        (?:
-          s
-            |
-          ing
-        )?
-      )(?<start>.*)
+        #{START}
+      )
+      (?<start>.*)
     /ix
 
     START_ENDING_REGEX = /^
-      (?:
-        start
-        (?:
-          s
-            |
-          ing
-        )?
-      )
+      (?: #{START} )
       \s
       (?<start>.*)
       (?:
@@ -93,11 +78,7 @@ module Tickle
             |
           until
         )
-        (?:
-          s
-            |
-          ing
-        )?
+        (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
       )
       (?<finish>.*)
     /ix
