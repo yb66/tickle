@@ -22,6 +22,12 @@
 module Tickle
 
   module Patterns
+    END_OR_UNTIL  = /
+      \bend
+        |
+      until
+    /x
+
     SET_IDENTIFIER = /
       every
         |
@@ -31,7 +37,7 @@ module Tickle
         |
       repeat
     /x
-        
+  
     PLURAL_OR_PRESENT_PARTICIPLE = /
         s
           |
@@ -74,14 +80,20 @@ module Tickle
       (?<start>.*)
       (?:
         \s+
-        (?:
-          \bend
-            |
-          until
-        )
+        (?: #{END_OR_UNTIL} )
         (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
       )
       (?<finish>.*)
+    /ix
+
+    PROCESS_FOR_ENDING = /^
+      (?<event>.*)
+      (
+        \s+
+        (?: #{END_OR_UNTIL})
+        (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
+      )
+      (?<ending>.*)
     /ix
 
   end
@@ -219,9 +231,8 @@ module Tickle
 
     # process the remaining expression to see if an until, end, ending is specified
     def process_for_ending(text)
-      regex = /^(.*)(\s(?:\bend|until)(?:s|ing)?)(.*)/i
-      if text =~ regex
-        return text.match(regex)[1], text.match(regex)[3]
+      if text =~ Patterns::PROCESS_FOR_ENDING
+        return text.match(Patterns::PROCESS_FOR_ENDING)[:event], text.match(Patterns::PROCESS_FOR_ENDING)[:ending]
       else
         return text, nil
       end
