@@ -1,13 +1,8 @@
-require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/test_*.rb'
-  test.verbose = true
-end
+require 'rspec/core/rake_task'
 
-task :test => :check_dependencies
+RSpec::Core::RakeTask.new(:spec)
 
-task :default => :test
+task :default => :spec
 
 
 desc "(Re-) generate documentation and place it in the docs/ dir. Open the index.html file in there to read it."
