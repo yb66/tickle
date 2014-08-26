@@ -20,6 +20,73 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 module Tickle
+
+  module Patterns
+    SET_IDENTIFIER = /
+      every
+        |
+      each
+        |
+      \bon(?:\s+the)?\b
+        |
+      repeat
+    /x
+        
+    PLURAL_OR_PRESENT_PARTICIPLE = /
+        s
+          |
+        ing
+    /x
+
+    START = /
+      start
+      (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
+    /x
+
+    START_EVERY_REGEX = /^
+    (?:
+      #{START}
+    )
+    \s+
+    (?<start>.*)
+    (?:
+      \s+
+      (?: #{SET_IDENTIFIER} )
+    )
+    (?<target>.*)
+  /ix
+
+
+    EVERY_START_REGEX = /^
+      (?: #{SET_IDENTIFIER} )
+      \s+
+      (?<target>.*)
+      (?:
+        \s+
+        #{START}
+      )
+      (?<start>.*)
+    /ix
+
+    START_ENDING_REGEX = /^
+      (?: #{START} )
+      \s+
+      (?<start>.*)
+      (?:
+        \s+
+        (?:
+          \bend
+            |
+          until
+        )
+        (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
+      )
+      (?<finish>.*)
+    /ix
+
+  end
+
+
   class << self
     # == Configuration options
     #
@@ -104,24 +171,21 @@ module Tickle
     # scans the expression for a variety of natural formats, such as 'every thursday starting tomorrow until May 15th
     def scan_expression(text, options)
       starting = ending = nil
-
-      start_every_regex = /^(start(?:s|ing)?)\s(.*)(\s(?:every|each|\bon\b|repeat)(?:s|ing)?)(.*)/i
-      every_start_regex = /^(every|each|\bon\b|repeat(?:the)?)\s(.*)(\s(?:start)(?:s|ing)?)(.*)/i
-      start_ending_regex = /^(start(?:s|ing)?)\s(.*)(\s(?:\bend|until)(?:s|ing)?)(.*)/i
-      if text =~ start_every_regex
-        starting = text.match(start_every_regex)[2].strip
-        text = text.match(start_every_regex)[4].strip
-        event, ending = process_for_ending(text)
-      elsif text =~ every_start_regex
-        event = text.match(every_start_regex)[2].strip
-        text = text.match(every_start_regex)[4].strip
-        starting, ending = process_for_ending(text)
-      elsif text =~ start_ending_regex
-        starting = text.match(start_ending_regex)[2].strip
-        ending = text.match(start_ending_regex)[4].strip
-        event = 'day'
-      else
-        event, ending = process_for_ending(text)
+      case text
+        when Patterns::START_EVERY_REGEX
+          starting = text.match(Patterns::START_EVERY_REGEX)[:start].strip
+          text = text.match(Patterns::START_EVERY_REGEX)[:target].strip
+          event, ending = process_for_ending(text)
+        when Patterns::EVERY_START_REGEX
+          event = text.match(Patterns::EVERY_START_REGEX)[:target].strip
+          text = text.match(Patterns::EVERY_START_REGEX)[:start].strip
+          starting, ending = process_for_ending(text)
+        when Patterns::START_ENDING_REGEX
+          starting = text.match(Patterns::START_ENDING_REGEX)[:start].strip
+          ending = text.match(Patterns::START_ENDING_REGEX)[:finish].strip
+          event = 'day'
+        else
+          event, ending = process_for_ending(text)
       end
 
       # they gave a phrase so if we can't interpret then we need to raise an error
