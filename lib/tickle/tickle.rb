@@ -23,7 +23,7 @@ module Tickle
 
 
   START_EVERY_REGEX = /^
-    (
+    (?:
       start
       (?:
         s
@@ -32,8 +32,9 @@ module Tickle
       )?
     )
     \s
-    (.*)
-    (\s
+    (?<start>.*)
+    (?:
+      \s
       (?:
         every
           |
@@ -49,11 +50,11 @@ module Tickle
         ing
       )?
     )
-    (.*)
+    (?<target>.*)
   /ix
 
   EVERY_START_REGEX = /^
-    (
+    (?:
       every
         |
       each
@@ -63,24 +64,30 @@ module Tickle
       repeat(?:the)?
     )
     \s
-    (.*)
-    (\s
+    (?<target>.*)
+    (?:\s
       (?:start)
       (?:
         s
           |
         ing
       )?
-    )(.*)
+    )(?<start>.*)
   /ix
 
   START_ENDING_REGEX = /^
-    (start
-      (?:s|ing)?
+    (?:
+      start
+      (?:
+        s
+          |
+        ing
+      )?
     )
     \s
-    (.*)
-    (\s
+    (?<start>.*)
+    (?:
+      \s
       (?:
         \bend
           |
@@ -92,7 +99,7 @@ module Tickle
         ing
       )?
     )
-    (.*)
+    (?<finish>.*)
   /ix
 
   class << self
@@ -181,16 +188,16 @@ module Tickle
       starting = ending = nil
       case text
         when START_EVERY_REGEX
-          starting = text.match(START_EVERY_REGEX)[2].strip
-          text = text.match(START_EVERY_REGEX)[4].strip
+          starting = text.match(START_EVERY_REGEX)[:start].strip
+          text = text.match(START_EVERY_REGEX)[:target].strip
           event, ending = process_for_ending(text)
         when EVERY_START_REGEX
-          event = text.match(EVERY_START_REGEX)[2].strip
-          text = text.match(EVERY_START_REGEX)[4].strip
+          event = text.match(EVERY_START_REGEX)[:target].strip
+          text = text.match(EVERY_START_REGEX)[:start].strip
           starting, ending = process_for_ending(text)
         when START_ENDING_REGEX
-          starting = text.match(START_ENDING_REGEX)[2].strip
-          ending = text.match(START_ENDING_REGEX)[4].strip
+          starting = text.match(START_ENDING_REGEX)[:start].strip
+          ending = text.match(START_ENDING_REGEX)[:finish].strip
           event = 'day'
         else
           event, ending = process_for_ending(text)
