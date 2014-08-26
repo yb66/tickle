@@ -22,6 +22,12 @@
 module Tickle
 
   module Patterns
+    END_OR_UNTIL  = /
+      \bend
+        |
+      until
+    /x
+
     SET_IDENTIFIER = /
       every
         |
@@ -74,11 +80,7 @@ module Tickle
       (?<start>.*)
       (?:
         \s+
-        (?:
-          \bend
-            |
-          until
-        )
+        (?: #{END_OR_UNTIL} )
         (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
       )
       (?<finish>.*)
@@ -223,11 +225,7 @@ module Tickle
         (.*)
         (
           \s+
-          (?:
-            \bend
-              |
-            until
-          )
+          (?: #{Patterns::END_OR_UNTIL})
           (?:
             s
               |
