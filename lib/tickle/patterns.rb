@@ -42,9 +42,15 @@ module Tickle
         |
       each
         |
-      #{ON_THE}
-        |
-      repeat
+      (?: #{ON_THE} )
+    /x
+
+    # This is here so we can check for repetition
+    # and set 'until' more easily. If so desired.
+    REPETITION = /
+      (?<repeat>
+        repeat
+      )
     /x
 
     START = /
@@ -58,8 +64,12 @@ module Tickle
       )
       \s+
       (?<start>.*?)
+      (?:
+        \s+
+        #{REPETITION}
+      )?
       \s+
-      (?: #{SET_IDENTIFIER} )
+      #{SET_IDENTIFIER}
       \s+
       (?<event>.*)
     /ix

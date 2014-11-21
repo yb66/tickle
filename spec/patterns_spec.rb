@@ -79,6 +79,10 @@ module Tickle # for convenience
       context "Given 'on the'" do
         it { should match "on the" }
       end
+    end
+
+    describe "REPETITION" do
+      subject { Patterns::REPETITION }
       context "Given 'repeat'" do
         it { should match "repeat" }
       end
@@ -153,13 +157,23 @@ module Tickle # for convenience
 
     describe "START_EVERY_REGEX" do
       subject { Patterns::START_EVERY_REGEX }
-      let(:phrase) { "starting today on the 12th" }
       context "Given 'starting today on the 12th'" do
+      let(:phrase) { "starting today on the 12th" }
         it { should match phrase  }
+        its(:names) { should =~ %w{start event repeat} }
         describe "Captures" do
-          subject { Patterns::START_EVERY_REGEX.match "starting today on the 12th" }
+          subject { Patterns::START_EVERY_REGEX.match phrase }
           its([:start]) { should == "today" }
           its([:event]) { should == "12th" }
+        end
+      end
+      context "Given 'starting Monday repeat every month'" do
+      let(:phrase) { "starting Monday repeat every month" }
+        it { should match phrase  }
+        describe "Captures" do
+          subject { Patterns::START_EVERY_REGEX.match phrase }
+          its([:start]) { should == "Monday" }
+          its([:event]) { should == "month" }
         end
       end
     end
