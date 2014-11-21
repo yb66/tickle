@@ -57,10 +57,8 @@ module Tickle
       )
       \s+
       (?<start>.*?)
-      (?:
-        \s+
-        (?: #{SET_IDENTIFIER} )
-      )?
+      \s+
+      (?: #{SET_IDENTIFIER} )
       \s+
       (?<event>.*)
     /ix
