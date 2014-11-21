@@ -19,6 +19,7 @@ module Tickle
 
     END_OR_UNTIL  = /
       (?:
+        (?:\band\b\s+)?
         \bend
         (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
         (?:
@@ -83,7 +84,7 @@ module Tickle
     START_ENDING_REGEX = /^
       #{START}
       \s+
-      (?<start>.*)
+      (?<start>.*?)
       (?:
         \s+
         #{END_OR_UNTIL}

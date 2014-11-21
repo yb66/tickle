@@ -175,6 +175,15 @@ module Tickle # for convenience
           its([:finish]) { should == "12th" }
         end
       end
+      context "Given 'starting today and ending one week from now'" do
+        let(:phrase) { "starting today and ending one week from now"}
+        it { should match phrase  }
+        describe "Captures" do
+          subject { Patterns::START_ENDING_REGEX.match phrase }
+          its([:start]) { should == "today" }
+          its([:finish]) { should == "one week from now" }
+        end
+      end
     end
 
     describe "EVERY_START_REGEX" do
