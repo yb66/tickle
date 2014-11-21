@@ -114,10 +114,10 @@ module Tickle
       case text
         when Patterns::START_EVERY_REGEX
           starting = text.match(Patterns::START_EVERY_REGEX)[:start].strip
-          text = text.match(Patterns::START_EVERY_REGEX)[:target].strip
+          text = text.match(Patterns::START_EVERY_REGEX)[:event].strip
           event, ending = process_for_ending(text)
         when Patterns::EVERY_START_REGEX
-          event = text.match(Patterns::EVERY_START_REGEX)[:target].strip
+          event = text.match(Patterns::EVERY_START_REGEX)[:event].strip
           text = text.match(Patterns::EVERY_START_REGEX)[:start].strip
           starting, ending = process_for_ending(text)
         when Patterns::START_ENDING_REGEX
@@ -161,7 +161,7 @@ module Tickle
     # process the remaining expression to see if an until, end, ending is specified
     def process_for_ending(text)
       if text =~ Patterns::PROCESS_FOR_ENDING
-        return text.match(Patterns::PROCESS_FOR_ENDING)[:event], text.match(Patterns::PROCESS_FOR_ENDING)[:ending]
+        return text.match(Patterns::PROCESS_FOR_ENDING)[:target], text.match(Patterns::PROCESS_FOR_ENDING)[:ending]
       else
         return text, nil
       end
