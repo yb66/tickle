@@ -17,3 +17,23 @@ end
 Dir[ File.join( Spec_dir, "/support/**/*.rb")].each do |f|
   require f
 end
+
+Time_now = Time.parse "2010-05-09 20:57:36 +0000"
+
+require 'timecop'
+
+RSpec.configure do |config|
+  config.expect_with :rspec do |c|
+    c.syntax = [:should, :expect]
+  end
+
+  tz = ENV["TZ"]
+  config.before(:all, :frozen => true) do
+    Timecop.freeze Time_now
+    ENV["TZ"] = "UTC"  
+  end
+  config.after(:all, :frozen => true) do
+    Timecop.return
+    ENV["TZ"] = tz
+  end
+end
