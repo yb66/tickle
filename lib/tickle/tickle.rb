@@ -22,6 +22,7 @@
 module Tickle
 
   require_relative "patterns.rb"
+  require 'numerizer'
 
 
   class << self

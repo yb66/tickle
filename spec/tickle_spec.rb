@@ -320,7 +320,7 @@ describe "Parsing" do
 
       context "starting today and ending one week from now" do
         subject{ Tickle.parse('starting today and ending one week from now') }
-        let(:expected) { {:next=>Time.parse("2010-05-10 22:30:00 +0000"), :expression=>"day", :starting=>Time.parse("2010-05-09 22:30:00 +0000"), :until=>Time.parse("2010-05-16 20:57:36 +0000")} }
+        let(:expected) { {:next=>Time.parse("2010-05-10 22:00:00 +0000"), :expression=>"day", :starting=>Time.parse("2010-05-09 22:00:00 +0000"), :until=>Time.parse("2010-05-16 20:57:36 +0000")} }
         it { should == expected }
       end
 
