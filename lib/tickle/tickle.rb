@@ -21,82 +21,7 @@
 
 module Tickle
 
-  module Patterns
-    END_OR_UNTIL  = /
-      \bend
-        |
-      until
-    /x
-
-    SET_IDENTIFIER = /
-      every
-        |
-      each
-        |
-      \bon(?:\s+the)?\b
-        |
-      repeat
-    /x
-  
-    PLURAL_OR_PRESENT_PARTICIPLE = /
-        s
-          |
-        ing
-    /x
-
-    START = /
-      start
-      (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
-    /x
-
-    START_EVERY_REGEX = /^
-    (?:
-      #{START}
-    )
-    \s+
-    (?<start>.*)
-    (?:
-      \s+
-      (?: #{SET_IDENTIFIER} )
-    )
-    (?<target>.*)
-  /ix
-
-
-    EVERY_START_REGEX = /^
-      (?: #{SET_IDENTIFIER} )
-      \s+
-      (?<target>.*)
-      (?:
-        \s+
-        #{START}
-      )
-      (?<start>.*)
-    /ix
-
-    START_ENDING_REGEX = /^
-      (?: #{START} )
-      \s+
-      (?<start>.*)
-      (?:
-        \s+
-        (?: #{END_OR_UNTIL} )
-        (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
-      )
-      (?<finish>.*)
-    /ix
-
-    PROCESS_FOR_ENDING = /^
-      (?<event>.*)
-      (
-        \s+
-        (?: #{END_OR_UNTIL})
-        (?: #{PLURAL_OR_PRESENT_PARTICIPLE} )?
-      )
-      (?<ending>.*)
-    /ix
-
-  end
+  require_relative "patterns.rb"
 
 
   class << self
@@ -189,10 +114,10 @@ module Tickle
       case text
         when Patterns::START_EVERY_REGEX
           starting = text.match(Patterns::START_EVERY_REGEX)[:start].strip
-          text = text.match(Patterns::START_EVERY_REGEX)[:target].strip
+          text = text.match(Patterns::START_EVERY_REGEX)[:event].strip
           event, ending = process_for_ending(text)
         when Patterns::EVERY_START_REGEX
-          event = text.match(Patterns::EVERY_START_REGEX)[:target].strip
+          event = text.match(Patterns::EVERY_START_REGEX)[:event].strip
           text = text.match(Patterns::EVERY_START_REGEX)[:start].strip
           starting, ending = process_for_ending(text)
         when Patterns::START_ENDING_REGEX
@@ -236,7 +161,7 @@ module Tickle
     # process the remaining expression to see if an until, end, ending is specified
     def process_for_ending(text)
       if text =~ Patterns::PROCESS_FOR_ENDING
-        return text.match(Patterns::PROCESS_FOR_ENDING)[:event], text.match(Patterns::PROCESS_FOR_ENDING)[:ending]
+        return text.match(Patterns::PROCESS_FOR_ENDING)[:target], text.match(Patterns::PROCESS_FOR_ENDING)[:ending]
       else
         return text, nil
       end
@@ -287,33 +212,33 @@ module Tickle
     # parsed.
     def normalize_us_holidays(text)
       normalized_text = text.to_s.downcase
-      normalized_text.gsub!(/\bnew\syear'?s?(\s)?(day)?\b/, "january 1, #{next_appropriate_year(1, 1)}")
-      normalized_text.gsub!(/\bnew\syear'?s?(\s)?(eve)?\b/, "december 31, #{next_appropriate_year(12, 31)}")
-      normalized_text.gsub!(/\bm(artin\s)?l(uther\s)?k(ing)?(\sday)?\b/, 'third monday in january')
-      normalized_text.gsub!(/\binauguration(\sday)?\b/, 'january 20')
-      normalized_text.gsub!(/\bpresident'?s?(\sday)?\b/, 'third monday in february')
-      normalized_text.gsub!(/\bmemorial\sday\b/, '4th monday of may')
-      normalized_text.gsub!(/\bindepend(e|a)nce\sday\b/, "july 4, #{next_appropriate_year(7, 4)}")
-      normalized_text.gsub!(/\blabor\sday\b/, 'first monday in september')
-      normalized_text.gsub!(/\bcolumbus\sday\b/, 'second monday in october')
-      normalized_text.gsub!(/\bveterans?\sday\b/, "november 11, #{next_appropriate_year(11, 1)}")
-      normalized_text.gsub!(/\bthanksgiving(\sday)?\b/, 'fourth thursday in november')
-      normalized_text.gsub!(/\bchristmas\seve\b/, "december 24, #{next_appropriate_year(12, 24)}")
-      normalized_text.gsub!(/\bchristmas(\sday)?\b/, "december 25, #{next_appropriate_year(12, 25)}")
-      normalized_text.gsub!(/\bsuper\sbowl(\ssunday)?\b/, 'first sunday in february')
-      normalized_text.gsub!(/\bgroundhog(\sday)?\b/, "february 2, #{next_appropriate_year(2, 2)}")
-      normalized_text.gsub!(/\bvalentine'?s?(\sday)?\b/, "february 14, #{next_appropriate_year(2, 14)}")
-      normalized_text.gsub!(/\bs(ain)?t\spatrick'?s?(\sday)?\b/, "march 17, #{next_appropriate_year(3, 17)}")
-      normalized_text.gsub!(/\bapril\sfool'?s?(\sday)?\b/, "april 1, #{next_appropriate_year(4, 1)}")
-      normalized_text.gsub!(/\bearth\sday\b/, "april 22, #{next_appropriate_year(4, 22)}")
-      normalized_text.gsub!(/\barbor\sday\b/, 'fourth friday in april')
-      normalized_text.gsub!(/\bcinco\sde\smayo\b/, "may 5, #{next_appropriate_year(5, 5)}")
-      normalized_text.gsub!(/\bmother'?s?\sday\b/, 'second sunday in may')
-      normalized_text.gsub!(/\bflag\sday\b/, "june 14, #{next_appropriate_year(6, 14)}")
-      normalized_text.gsub!(/\bfather'?s?\sday\b/, 'third sunday in june')
-      normalized_text.gsub!(/\bhalloween\b/, "october 31, #{next_appropriate_year(10, 31)}")
-      normalized_text.gsub!(/\belection\sday\b/, 'second tuesday in november')
-      normalized_text.gsub!(/\bkwanzaa\b/, "january 1, #{next_appropriate_year(1, 1)}")
+      normalized_text.gsub!(/\bnew\syear'?s?(\s)?(day)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bnew\syear'?s?(\s)?(eve)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bm(artin\s)?l(uther\s)?k(ing)?(\sday)?\b/){|md| $1 }
+      normalized_text.gsub!(/\binauguration(\sday)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bpresident'?s?(\sday)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bmemorial\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\bindepend(e|a)nce\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\blabor\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\bcolumbus\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\bveterans?\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\bthanksgiving(\sday)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bchristmas\seve\b/){|md| $1 }
+      normalized_text.gsub!(/\bchristmas(\sday)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bsuper\sbowl(\ssunday)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bgroundhog(\sday)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bvalentine'?s?(\sday)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bs(ain)?t\spatrick'?s?(\sday)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bapril\sfool'?s?(\sday)?\b/){|md| $1 }
+      normalized_text.gsub!(/\bearth\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\barbor\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\bcinco\sde\smayo\b/){|md| $1 }
+      normalized_text.gsub!(/\bmother'?s?\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\bflag\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\bfather'?s?\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\bhalloween\b/){|md| $1 }
+      normalized_text.gsub!(/\belection\sday\b/){|md| $1 }
+      normalized_text.gsub!(/\bkwanzaa\b/){|md| $1 }
       normalized_text
     end
 
