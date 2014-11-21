@@ -131,8 +131,7 @@ module Tickle
 
       # they gave a phrase so if we can't interpret then we need to raise an error
       if starting
-        Tickle.dwrite("starting: #{starting}")
-        @start = chronic_parse(pre_filter(starting))
+        @start = chronic_parse(pre_filter(starting),options, :start)
         if @start
           @start.to_time
         else
@@ -143,7 +142,7 @@ module Tickle
       end
 
       if ending
-        @until = chronic_parse(pre_filter(ending))
+        @until = chronic_parse(pre_filter(ending),options, :until)
         if @until
           @until.to_time
         else
@@ -293,10 +292,14 @@ module Tickle
     # slightly modified chronic parser to ensure that the date found is in the future
     # first we check to see if an explicit date was passed and, if so, dont do anything.
     # if, however, a date expression was passed we evaluate and shift forward if needed
-    def chronic_parse(exp)
-      result = Chronic.parse(exp.ordinal_as_number)
-      result = Time.local(result.year + 1, result.month, result.day, result.hour, result.min, result.sec) if result && result.to_time < Time.now
-      Tickle.dwrite("Chronic.parse('#{exp}') # => #{result}")
+    def chronic_parse(exp,options, start_or_until)
+      result = 
+        Chronic.parse(exp.ordinal_as_number) ||
+        (start_or_until && options[start_or_until]) ||
+        (start_or_until == :start && options[:now])
+      if result && result.to_time < Time.now
+        result = Time.local(result.year + 1, result.month, result.day, result.hour, result.min, result.sec)
+      end
       result
     end
 
