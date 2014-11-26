@@ -23,6 +23,7 @@ module Tickle
 
   require_relative "patterns.rb"
   require 'numerizer'
+  require_relative "helpers.rb"
 
 
   class << self
@@ -89,7 +90,7 @@ module Tickle
         @tokens.reject! {|token| token.type.nil? }
 
         # combine number and ordinals into single number
-        combine_multiple_numbers
+        @tokens = Helpers.combine_multiple_numbers(@tokens)
 
         @tokens.each {|x| Tickle.dwrite("processed: #{x.inspect}")}
 
