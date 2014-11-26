@@ -96,7 +96,7 @@ module Tickle
         @tokens.each {|x| Tickle.dwrite("processed: #{x.inspect}")}
 
         # if we can't guess it maybe chronic can
-        _guess = guess(@tokens)
+        _guess = guess(@tokens, @start)
         best_guess = _guess || chronic_parse(event)
       end
 
