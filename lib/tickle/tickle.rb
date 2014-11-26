@@ -28,6 +28,8 @@ module Tickle
 
 
   class << self
+
+
     # == Configuration options
     #
     # @param [String] text The string Tickle should parse.
@@ -42,7 +44,7 @@ module Tickle
     #    Tickle.parse("every Tuesday")
     #    # => {:next=>2014-08-26 12:00:00 0100, :expression=>"tuesday", :starting=>2014-08-25 16:31:12 0100, :until=>nil}
     #
-    def parse(text, specified_options = {})
+    def _parse(text, specified_options = {})
       # get options and set defaults if necessary.  Ability to set now is mostly for debugging
       default_options = {:start => Time.now, :next_only => false, :until => nil, :now => Time.now}
       options = default_options.merge specified_options

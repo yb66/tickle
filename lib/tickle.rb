@@ -24,6 +24,11 @@ require_relative "ext/string.rb"
 module Tickle
 
 
+  def self.parse(text, specified_options = {})
+    _parse text, specified_options
+  end
+
+
   def self.is_date(str)
     begin
       Date.parse(str.to_s)
