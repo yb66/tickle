@@ -1,15 +1,27 @@
 module Tickle
 
-  class Token
-    attr_accessor :original, :word, :type, :interval, :start
+  # An extended String
+  class Token < ::String
+    attr_accessor :original
 
 
-    def initialize(original, word=nil, type=nil, start=nil, interval=nil)
+    # !@attribute [rw] word Normalized original
+    #   @return [String]
+    attr_accessor:word
+    
+    attr_accessor :type, :interval, :start
+
+
+    # @param [#downcase] original
+    # @param [Hash] options
+    # @option options [String] :word Normalized original, the implied word
+    def initialize(original, options={})
       @original = original
-      @word = word
-      @type = type
-      @interval = interval
-      @start = start
+      @word     = options[:word]
+      @type     = options[:type]
+      @interval = options[:interval]
+      @start    = options[:start]
+      super @original
     end
 
 

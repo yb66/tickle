@@ -16,8 +16,8 @@ describe "Helpers module" do
     context "When given compound numbers" do
       context "like 'twenty first'" do
         let(:tokens) { [
-          Token.new("twenty", "20", :number, 20, 20),
-          Token.new("first", "1st", :ordinal, 1, 1),
+          Token.new("twenty", word: "20", type: :number, start: 20, interval: 20),
+          Token.new("first", word: "1st", type: :ordinal, start: 1, interval: 1),
         ] }
         subject{ out.first }
         its(:original) { should == "twenty first" } 
