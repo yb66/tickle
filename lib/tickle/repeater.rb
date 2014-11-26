@@ -32,7 +32,6 @@ module Tickle
           }
           nil # if nothing matched, set to nil
         }
-        warn "  new_details: #{new_details.inspect}" if new_details
         token.update! new_details if new_details
       end
       self
