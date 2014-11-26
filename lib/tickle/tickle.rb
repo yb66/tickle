@@ -62,7 +62,6 @@ module Tickle
       # check to see if this event starts some other time and reset now
       event = scan_expression(text, options)
 
-      Tickle.dwrite("start: #{@start}, until: #{@until}, now: #{options[:now].to_date}")
 
       # => ** this is mostly for testing. Bump by 1 day if today (or in the past for testing)
       fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur in the past for a future event") if @start && @start.to_date < Date.today
@@ -82,8 +81,6 @@ module Tickle
         # process each original word for implied word
         post_tokenize
 
-        @tokens.each {|x| Tickle.dwrite("raw: #{x.inspect}")}
-
         # scan the tokens with each token scanner
         @tokens = Repeater.scan(@tokens)
 
@@ -92,8 +89,6 @@ module Tickle
 
         # combine number and ordinals into single number
         @tokens = Helpers.combine_multiple_numbers(@tokens)
-
-        @tokens.each {|x| Tickle.dwrite("processed: #{x.inspect}")}
 
         # if we can't guess it maybe chronic can
         _guess = guess(@tokens, @start)

@@ -23,11 +23,6 @@ require_relative "ext/string.rb"
 # Tickle is a natural language parser for recurring events.
 module Tickle
 
-  def self.debug=(val); @debug = val; end
-
-  def self.dwrite(msg, line_feed=nil)
-    (line_feed ? p(">> #{msg}") : puts(">> #{msg}")) if @debug
-  end
 
   def self.is_date(str)
     begin
