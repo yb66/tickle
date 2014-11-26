@@ -273,7 +273,7 @@ module Tickle
     # if, however, a date expression was passed we evaluate and shift forward if needed
     def chronic_parse(exp,options, start_or_until)
       result = 
-        Chronic.parse(exp.ordinal_as_number) ||
+        Chronic.parse(exp.ordinal_as_number, :now => options[:now]) ||
         (start_or_until && options[start_or_until]) ||
         (start_or_until == :start && options[:now])
       if result && result.to_time < Time.now
