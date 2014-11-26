@@ -24,6 +24,7 @@ module Tickle
   require_relative "patterns.rb"
   require 'numerizer'
   require_relative "helpers.rb"
+  require_relative "token.rb"
 
 
   class << self
@@ -244,21 +245,6 @@ module Tickle
     end
 
 
-    # Turns compound numbers, like 'twenty first' => 21
-    def combine_multiple_numbers
-      if [:number, :ordinal].all? {|type| token_types.include? type}
-        number = token_of_type(:number)
-        ordinal = token_of_type(:ordinal)
-        combined_original = "#{number.original} #{ordinal.original}"
-        combined_word = (number.start.to_s[0] + ordinal.word)
-        combined_value = (number.start.to_s[0] + ordinal.start.to_s)
-        new_number_token = Token.new(combined_original, combined_word, :ordinal, combined_value, 365)
-        @tokens.reject! {|token| (token.type == :number || token.type == :ordinal)}
-        @tokens << new_number_token
-      end
-    end
-
-
     # Returns an array of types for all tokens
     def token_types
       @tokens.map(&:type)
@@ -276,14 +262,6 @@ module Tickle
     def next_appropriate_year(month, day)
       year = (Date.new(@start.year.to_i, month.to_i, day.to_i) == @start.to_date) ? @start.year + 1 : @start.year
       return year
-    end
-
-
-    # Return the number of days in a specified month.
-    # If no month is specified, current month is used.
-    def days_in_month(month=nil)
-      month ||= Date.today.month
-      days_in_mon = Date.civil(Date.today.year, month, -1).day
     end
 
 
