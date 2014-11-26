@@ -82,7 +82,7 @@ module Tickle
         @tokens = post_tokenize Token.tokenize(event)
 
         # scan the tokens with each token scanner
-        @tokens = Repeater.scan(@tokens)
+        @tokens = Token.scan!(@tokens)
 
         # remove all tokens without a type
         @tokens.reject! {|token| token.type.nil? }
@@ -92,7 +92,7 @@ module Tickle
 
         # if we can't guess it maybe chronic can
         _guess = guess(@tokens, @start)
-        best_guess = _guess || chronic_parse(event)
+        best_guess = _guess || chronic_parse(event) # TODO fix this call 
       end
 
       fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
@@ -252,7 +252,8 @@ module Tickle
     # slightly modified chronic parser to ensure that the date found is in the future
     # first we check to see if an explicit date was passed and, if so, dont do anything.
     # if, however, a date expression was passed we evaluate and shift forward if needed
-    def chronic_parse(exp,options, start_or_until)
+    def chronic_parse(exp, options, start_or_until)
+      exp = Ordinal.new exp
       result = 
         Chronic.parse(exp.ordinal_as_number, :now => options[:now]) ||
         (start_or_until && options[start_or_until]) ||

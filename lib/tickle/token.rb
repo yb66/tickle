@@ -79,5 +79,15 @@ module Tickle
       tokens.detect {|token| token.type == type}
     end
 
+
+
+    # @return [Array<Tickle::Token>]
+    def self.scan!( tokens )
+      fail ArgumentError, "Token#scan must be provided with and Array of Tokens to work with." unless tokens.respond_to? :each
+      repeater = Repeater.new tokens
+      repeater.scan!
+      repeater.tokens
+    end
+
   end
 end
