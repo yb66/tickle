@@ -96,7 +96,8 @@ module Tickle
         @tokens.each {|x| Tickle.dwrite("processed: #{x.inspect}")}
 
         # if we can't guess it maybe chronic can
-        best_guess = (guess(@tokens) || chronic_parse(event))
+        _guess = guess(@tokens)
+        best_guess = _guess || chronic_parse(event)
       end
 
       fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
