@@ -26,7 +26,7 @@ module Tickle
 
 
     # Updates an existing token.  Mostly used by the repeater class.
-    def update(type, start=nil, interval=nil)
+    def update!(type, start=nil, interval=nil)
       @start = start
       @type = type
       @interval = interval
