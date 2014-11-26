@@ -92,7 +92,7 @@ module Tickle
 
         # if we can't guess it maybe chronic can
         _guess = guess(@tokens, @start)
-        best_guess = _guess || chronic_parse(event)
+        best_guess = _guess || chronic_parse(event) # TODO fix this call 
       end
 
       fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
