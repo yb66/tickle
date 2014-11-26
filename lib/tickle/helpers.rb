@@ -32,8 +32,8 @@ module Tickle
 
     # Turns compound numbers, like 'twenty first' => 21
     def self.combine_multiple_numbers(tokens)
-      if  Token.token_types(tokens).include?(:number) &&
-          Token.token_types(tokens).include?(:ordinal) 
+      if  Token.types(tokens).include?(:number) &&
+          Token.types(tokens).include?(:ordinal) 
             number = Token.token_of_type(:number, tokens)
             ordinal = Token.token_of_type(:ordinal, tokens)
             combined_original = "#{number.original} #{ordinal.original}"
