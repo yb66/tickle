@@ -71,7 +71,6 @@ module Tickle
     end
 
 
-
     # Returns an array of types for all tokens
     def self.types(tokens)
       tokens.map(&:type)
@@ -81,7 +80,6 @@ module Tickle
     def self.token_of_type(type, tokens)
       tokens.detect {|token| token.type == type}
     end
-
 
 
     # @return [Array<Tickle::Token>]
