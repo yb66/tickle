@@ -58,6 +58,16 @@ module Tickle
     end
 
 
+    # Split the text on spaces and convert each word into
+    # a Token
+    # @param [#split] text The text to be tokenized.
+    # @return [Array<Token>] The tokens.
+    def self.tokenize(text)
+      fail ArgumentError unless text.respond_to? :split
+      text.split(/\s+/).map { |word| Token.new(word) }
+    end
+
+
 
     # Returns an array of types for all tokens
     def self.types(tokens)

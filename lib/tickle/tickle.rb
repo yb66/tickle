@@ -78,7 +78,7 @@ module Tickle
         event = pre_filter(event)
 
         # split into tokens
-        @tokens = base_tokenize(event)
+        @tokens = Token.tokenize(event)
 
         # process each original word for implied word
         post_tokenize
@@ -179,13 +179,6 @@ module Tickle
       text.gsub!(/([^\w\d\s])+/, '')
       text.downcase.strip
       text = normalize_us_holidays(text)
-    end
-
-
-    # Split the text on spaces and convert each word into
-    # a Token
-    def base_tokenize(text)
-      text.split(' ').map { |word| Token.new(word) }
     end
 
 
