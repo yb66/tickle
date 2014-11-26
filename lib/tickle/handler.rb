@@ -9,8 +9,8 @@ module Tickle
     # parsed by Chronic or returned.  This methodology makes extension fairly simple, as new token types can be
     # easily added in repeater and then processed by the guess method
     #
-    def guess()
-      return nil if @tokens.empty?
+    def guess(tokens)
+      return nil if tokens.empty?
 
       guess_unit_types
       guess_weekday unless @next
