@@ -192,21 +192,10 @@ module Tickle
     # normalizes each token
     def post_tokenize
       @tokens.each do |token|
-        token.word = normalize(token.original)
+        token.normalize!
       end
     end
 
-    # Clean up the specified input text by stripping unwanted characters,
-    # converting idioms to their canonical form, converting number words
-    # to numbers (three => 3), and converting ordinal words to numeric
-    # ordinals (third => 3rd)
-    def normalize(text)
-      normalized_text = text.to_s.downcase
-      normalized_text = Numerizer.numerize(normalized_text)
-      normalized_text.gsub!(/['"\.]/, '')
-      normalized_text.gsub!(/([\/\-\,\@])/) { ' ' + $1 + ' ' }
-      normalized_text
-    end
 
     # Converts natural language US Holidays into a date expression to be
     # parsed.

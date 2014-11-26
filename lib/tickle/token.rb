@@ -39,6 +39,25 @@ module Tickle
     end
 
 
+    COMMON_SYMBOLS = %r{
+      (
+        [ / \- , @ ]
+      )
+    }x
+
+
+    # Clean up the specified input text by stripping unwanted characters,
+    # converting idioms to their canonical form, converting number words
+    # to numbers (three => 3), and converting ordinal words to numeric
+    # ordinals (third => 3rd)
+    def normalize!
+      @word = Numerizer.numerize(@original.downcase)
+                .gsub(/['"\.]/, '')
+                .gsub(COMMON_SYMBOLS) {" #{$1} "}
+      self
+    end
+
+
 
     # Returns an array of types for all tokens
     def self.types(tokens)
