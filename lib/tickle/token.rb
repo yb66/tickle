@@ -1,23 +1,70 @@
 module Tickle
 
-  class Token
-    attr_accessor :original, :word, :type, :interval, :start
+  # An extended String
+  class Token < ::String
+    attr_accessor :original
 
 
-    def initialize(original, word=nil, type=nil, start=nil, interval=nil)
+    # !@attribute [rw] word Normalized original
+    #   @return [String]
+    attr_accessor:word
+    
+    attr_accessor :type, :interval, :start
+
+
+    # @param [#downcase] original
+    # @param [Hash] options
+    # @option options [String] :word Normalized original, the implied word
+    def initialize(original, options={})
       @original = original
-      @word = word
-      @type = type
-      @interval = interval
-      @start = start
+      @word     = options[:word]
+      @type     = options[:type]
+      @interval = options[:interval]
+      @start    = options[:start]
+      super @original
     end
 
 
-    # Updates an existing token.  Mostly used by the repeater class.
-    def update(type, start=nil, interval=nil)
-      @start = start
-      @type = type
-      @interval = interval
+    def update!(options={})
+      options = {
+        :start    =>  nil,
+        :interval =>  nil,
+      }.merge( options )
+      fail ArgumentError, "Token#update! must be passed a 'type'" if options.nil? or options.empty? or not options.has_key?(:type) or options[:type].nil?
+
+      @type = options[:type]
+      @start = options[:start]
+      @interval = options[:interval]
+      self
+    end
+
+
+    COMMON_SYMBOLS = %r{
+      (
+        [ / \- , @ ]
+      )
+    }x
+
+
+    # Clean up the specified input text by stripping unwanted characters,
+    # converting idioms to their canonical form, converting number words
+    # to numbers (three => 3), and converting ordinal words to numeric
+    # ordinals (third => 3rd)
+    def normalize!
+      @word = Numerizer.numerize(@original.downcase)
+                .gsub(/['"\.]/, '')
+                .gsub(COMMON_SYMBOLS) {" #{$1} "}
+      self
+    end
+
+
+    # Split the text on spaces and convert each word into
+    # a Token
+    # @param [#split] text The text to be tokenized.
+    # @return [Array<Token>] The tokens.
+    def self.tokenize(text)
+      fail ArgumentError unless text.respond_to? :split
+      text.split(/\s+/).map { |word| Token.new(word) }
     end
 
 

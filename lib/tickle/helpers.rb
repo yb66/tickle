@@ -39,7 +39,7 @@ module Tickle
             combined_original = "#{number.original} #{ordinal.original}"
             combined_word = (number.start.to_s[0] + ordinal.word)
             combined_value = (number.start.to_s[0] + ordinal.start.to_s)
-            new_number_token = Token.new(combined_original, combined_word, :ordinal, combined_value, 365)
+            new_number_token = Token.new(combined_original, word: combined_word, type: :ordinal, start: combined_value, interval: 365)
             tokens.reject! {|token| (token.type == :number || token.type == :ordinal)}
             tokens << new_number_token
       end

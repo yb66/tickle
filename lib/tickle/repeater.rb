@@ -1,5 +1,6 @@
 module Tickle
   class Repeater
+    require_relative "token.rb"
     #
     def self.scan(tokens)
       # for each token
@@ -18,7 +19,7 @@ module Tickle
 
     def self.scan_for_numbers(token)
       regex = /\b(\d\d?)\b/
-      token.update(:number, token.word.gsub(regex,'\1').to_i, token.word.gsub(regex,'\1').to_i) if token.word =~ regex
+      token.update!(type: :number, start: token.word.gsub(regex,'\1').to_i, interval: token.word.gsub(regex,'\1').to_i) if token.word =~ regex
       token
     end
 
@@ -48,7 +49,7 @@ module Tickle
       scanner.keys.each do |scanner_item|
         if scanner_item =~ token.original
           token.word = scanner[scanner_item]
-          token.update(:ordinal, scanner[scanner_item].ordinal_as_number, Helpers.days_in_month(Helpers.get_next_month(scanner[scanner_item].ordinal_as_number)))
+          token.update!(type: :ordinal, start: scanner[scanner_item].ordinal_as_number, interval: Helpers.days_in_month(Helpers.get_next_month(scanner[scanner_item].ordinal_as_number)))
         end
       end
       token
@@ -58,7 +59,7 @@ module Tickle
       regex = /\b(\d*)(st|nd|rd|th)\b/
       if token.original =~ regex
         token.word = token.original
-        token.update(:ordinal, token.word.ordinal_as_number, Helpers.days_in_month(Helpers.get_next_month(token.word)))
+        token.update!(type: :ordinal, start: token.word.ordinal_as_number, interval: Helpers.days_in_month(Helpers.get_next_month(token.word)))
       end
       token
     end
@@ -77,7 +78,7 @@ module Tickle
         /^nov\.?(ember)?$/ => 11,
       /^dec\.?(ember)?$/ => 12}
       scanner.keys.each do |scanner_item|
-        token.update(:month_name, scanner[scanner_item], 30) if scanner_item =~ token.word
+        token.update!(type: :month_name, start: scanner[scanner_item], interval: 30) if scanner_item =~ token.word
       end
       token
     end
@@ -94,14 +95,14 @@ module Tickle
         /^sat(t?[ue]rday)?$/ => :saturday,
       /^su[nm](day)?$/ => :sunday}
       scanner.keys.each do |scanner_item|
-        token.update(:weekday, scanner[scanner_item], 7) if scanner_item =~ token.word
+        token.update!(type: :weekday, start: scanner[scanner_item], interval: 7) if scanner_item =~ token.word
       end
       token
     end
 
     def self.scan_for_year_name(token)
       regex = /\b\d{4}\b/
-      token.update(:specific_year, token.original.gsub(regex,'\1'), 365) if token.original =~ regex
+      token.update!(type: :specific_year, start: token.original.gsub(regex,'\1'), interval: 365) if token.original =~ regex
       token
     end
 
@@ -112,7 +113,10 @@ module Tickle
         /^end$/ => :end,
       /^mid(d)?le$/ => :middle}
       scanner.keys.each do |scanner_item|
-        token.update(:special, scanner[scanner_item], 7) if scanner_item =~ token.word
+        token.update!(
+          type: :special,
+          start: scanner[scanner_item], interval: 7
+        ) if scanner_item =~ token.word
       end
       token
     end
@@ -127,7 +131,11 @@ module Tickle
       /^daily?$/ => {:type => :day, :interval => 0, :start => :today}}
       scanner.keys.each do |scanner_item|
         if scanner_item =~ token.word
-          token.update(scanner[scanner_item][:type], scanner[scanner_item][:start], scanner[scanner_item][:interval]) if scanner_item =~ token.word
+          token.update!(
+            type: scanner[scanner_item][:type],
+            start: scanner[scanner_item][:start],
+            interval: scanner[scanner_item][:interval]
+          ) if scanner_item =~ token.word
         end
       end
       token

@@ -28,6 +28,8 @@ module Tickle
 
 
   class << self
+
+
     # == Configuration options
     #
     # @param [String] text The string Tickle should parse.
@@ -42,7 +44,7 @@ module Tickle
     #    Tickle.parse("every Tuesday")
     #    # => {:next=>2014-08-26 12:00:00 0100, :expression=>"tuesday", :starting=>2014-08-25 16:31:12 0100, :until=>nil}
     #
-    def parse(text, specified_options = {})
+    def _parse(text, specified_options = {})
       # get options and set defaults if necessary.  Ability to set now is mostly for debugging
       default_options = {:start => Time.now, :next_only => false, :until => nil, :now => Time.now}
       options = default_options.merge specified_options
@@ -75,11 +77,9 @@ module Tickle
         # put the text into a normal format to ease scanning using Chronic
         event = pre_filter(event)
 
-        # split into tokens
-        @tokens = base_tokenize(event)
-
+        # split into tokens and then
         # process each original word for implied word
-        post_tokenize
+        @tokens = post_tokenize Token.tokenize(event)
 
         # scan the tokens with each token scanner
         @tokens = Repeater.scan(@tokens)
@@ -180,31 +180,16 @@ module Tickle
     end
 
 
-    # Split the text on spaces and convert each word into
-    # a Token
-    def base_tokenize(text)
-      text.split(' ').map { |word| Token.new(word) }
-    end
-
 
     # normalizes each token
-    def post_tokenize
-      @tokens.each do |token|
-        token.word = normalize(token.original)
+    def post_tokenize(tokens)
+      _tokens = tokens.map(&:clone)
+      _tokens.each do |token|
+        token.normalize!
       end
+      _tokens
     end
 
-    # Clean up the specified input text by stripping unwanted characters,
-    # converting idioms to their canonical form, converting number words
-    # to numbers (three => 3), and converting ordinal words to numeric
-    # ordinals (third => 3rd)
-    def normalize(text)
-      normalized_text = text.to_s.downcase
-      normalized_text = Numerizer.numerize(normalized_text)
-      normalized_text.gsub!(/['"\.]/, '')
-      normalized_text.gsub!(/([\/\-\,\@])/) { ' ' + $1 + ' ' }
-      normalized_text
-    end
 
     # Converts natural language US Holidays into a date expression to be
     # parsed.
