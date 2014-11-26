@@ -3,13 +3,12 @@ module Tickle
   require_relative "helpers.rb"
   require_relative "token.rb"
 
-  class << self
 
     # The heavy lifting.  Goes through each token groupings to determine what natural language should either by
     # parsed by Chronic or returned.  This methodology makes extension fairly simple, as new token types can be
     # easily added in repeater and then processed by the guess method
     #
-    def guess(tokens)
+    def self.guess(tokens)
       return nil if tokens.empty?
 
       guess_unit_types
@@ -27,22 +26,23 @@ module Tickle
       return @next.to_time if @next
     end
 
-    def guess_unit_types
+    def self.guess_unit_types
       @next = @start.bump(:day) if Token.token_types(@tokens).same?([:day])
       @next = @start.bump(:week) if Token.token_types(@tokens).same?([:week])
       @next = @start.bump(:month) if Token.token_types(@tokens).same?([:month])
       @next = @start.bump(:year) if Token.token_types(@tokens).same?([:year])
     end
 
-    def guess_weekday
+
+    def self.guess_weekday
       @next = chronic_parse_with_start("#{Token.token_of_type(:weekday, @tokens).start.to_s}") if Token.token_types(@tokens).same?([:weekday])
     end
 
-    def guess_month_names
+    def self.guess_month_names
       @next = chronic_parse_with_start("#{Date::MONTHNAMES[Token.token_of_type(:month_name, @tokens).start]} 1") if Token.token_types(@tokens).same?([:month_name])
     end
 
-    def guess_number_and_unit
+    def self.guess_number_and_unit
       @next = @start.bump(:day, Token.token_of_type(:number, @tokens).interval) if Token.token_types(@tokens).same?([:number, :day])
       @next = @start.bump(:week, Token.token_of_type(:number, @tokens).interval) if Token.token_types(@tokens).same?([:number, :week])
       @next = @start.bump(:month, Token.token_of_type(:number, @tokens).interval) if Token.token_types(@tokens).same?([:number, :month])
@@ -51,11 +51,11 @@ module Tickle
       @next = chronic_parse_with_start("#{Token.token_of_type(:specific_year, @tokens).word}-#{Token.token_of_type(:month_name, @tokens).start}-#{Token.token_of_type(:number, @tokens).start}") if Token.token_types(@tokens).same?([:number, :month_name, :specific_year])
     end
 
-    def guess_ordinal
+    def self.guess_ordinal
       @next = handle_same_day_chronic_issue(@start.year, @start.month, Token.token_of_type(:ordinal, @tokens).start) if Token.token_types(@tokens).same?([:ordinal])
     end
 
-    def guess_ordinal_and_unit
+    def self.guess_ordinal_and_unit
       @next = handle_same_day_chronic_issue(@start.year, Token.token_of_type(:month_name, @tokens).start, Token.token_of_type(:ordinal, @tokens).start) if Token.token_types(@tokens).same?([:ordinal, :month_name])
       @next = handle_same_day_chronic_issue(@start.year, @start.month, Token.token_of_type(:ordinal, @tokens).start) if Token.token_types(@tokens).same?([:ordinal, :month])
       @next = handle_same_day_chronic_issue(Token.token_of_type(:specific_year, @tokens).word, Token.token_of_type(:month_name, @tokens).start, Token.token_of_type(:ordinal, @tokens).start) if Token.token_types(@tokens).same?([:ordinal, :month_name, :specific_year])
@@ -75,7 +75,7 @@ module Tickle
       end
     end
 
-    def guess_special
+    def self.guess_special
       guess_special_other
       guess_special_beginning unless @next
       guess_special_middle unless @next
@@ -84,26 +84,26 @@ module Tickle
 
     private
 
-    def guess_special_other
+    def self.guess_special_other
       @next = @start.bump(:day, 2) if Token.token_types(@tokens).same?([:special, :day]) && Token.token_of_type(:special, @tokens).start == :other
       @next = @start.bump(:week, 2)  if Token.token_types(@tokens).same?([:special, :week]) && Token.token_of_type(:special, @tokens).start == :other
       @next = chronic_parse_with_start('2 months from now') if Token.token_types(@tokens).same?([:special, :month]) && Token.token_of_type(:special, @tokens).start == :other
       @next = chronic_parse_with_start('2 years from now') if Token.token_types(@tokens).same?([:special, :year]) && Token.token_of_type(:special, @tokens).start == :other
     end
 
-    def guess_special_beginning
+    def self.guess_special_beginning
       if Token.token_types(@tokens).same?([:special, :week]) && Token.token_of_type(:special, @tokens).start == :beginning then @next = chronic_parse_with_start('Sunday'); end
       if Token.token_types(@tokens).same?([:special, :month]) && Token.token_of_type(:special, @tokens).start == :beginning then @next = Date.civil(@start.year, @start.month + 1, 1); end
       if Token.token_types(@tokens).same?([:special, :year]) && Token.token_of_type(:special, @tokens).start == :beginning then @next = Date.civil(@start.year+1, 1, 1); end
     end
 
-    def guess_special_end
+    def self.guess_special_end
       if Token.token_types(@tokens).same?([:special, :week]) && Token.token_of_type(:special, @tokens).start == :end then @next = chronic_parse_with_start('Saturday'); end
       if Token.token_types(@tokens).same?([:special, :month]) && Token.token_of_type(:special, @tokens).start == :end then @next = Date.civil(@start.year, @start.month, -1); end
       if Token.token_types(@tokens).same?([:special, :year]) && Token.token_of_type(:special, @tokens).start == :end then @next = Date.new(@start.year, 12, 31); end
     end
 
-    def guess_special_middle
+    def self.guess_special_middle
       if Token.token_types(@tokens).same?([:special, :week]) && Token.token_of_type(:special, @tokens).start == :middle then @next = chronic_parse_with_start('Wednesday'); end
       if Token.token_types(@tokens).same?([:special, :month]) && Token.token_of_type(:special, @tokens).start == :middle then
         @next = (@start.day > 15 ? Date.civil(@start.year, @start.month + 1, 15) : Date.civil(@start.year, @start.month, 15))
@@ -116,19 +116,16 @@ module Tickle
     private
 
     # runs Chronic.parse with now being set to the specified start date for Tickle parsing
-    def chronic_parse_with_start(exp)
+    def self.chronic_parse_with_start(exp)
       Chronic.parse(exp, :now => @start)
     end
 
     # needed to handle the unique situation where a number or ordinal plus optional month or month name is passed that is EQUAL to the start date since Chronic returns that day.
-    def handle_same_day_chronic_issue(year, month, day)
+    def self.handle_same_day_chronic_issue(year, month, day)
       arg_date = 
         Date.new(year.to_i, month.to_i, day.to_i) == @start.to_date ?
         Time.local(year, month+1, day) :
         Time.local(year, month, day)
       arg_date
     end
-
-
-  end
 end
