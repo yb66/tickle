@@ -21,12 +21,10 @@ module Tickle
       # check to see if next is less than now and, if so, set it to next year
       if  _next &&
           _next.to_date < start.to_date
-            @next = Time.local(_next.year + 1, _next.month, _next.day, _next.hour, _next.min, _next.sec) 
-      else
-        @next = _next
+            _next = Time.local(_next.year + 1, _next.month, _next.day, _next.hour, _next.min, _next.sec)
       end
       # return the next occurrence
-      @next.to_time if @next
+      _next.to_time if _next
     end
 
 
