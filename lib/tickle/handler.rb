@@ -1,4 +1,8 @@
 module Tickle
+
+  require_relative "helpers.rb"
+  require_relative "token.rb"
+
   class << self
 
     # The heavy lifting.  Goes through each token groupings to determine what natural language should either by
@@ -24,46 +28,50 @@ module Tickle
     end
 
     def guess_unit_types
-      @next = @start.bump(:day) if token_types.same?([:day])
-      @next = @start.bump(:week) if token_types.same?([:week])
-      @next = @start.bump(:month) if token_types.same?([:month])
-      @next = @start.bump(:year) if token_types.same?([:year])
+      @next = @start.bump(:day) if Token.token_types(@tokens).same?([:day])
+      @next = @start.bump(:week) if Token.token_types(@tokens).same?([:week])
+      @next = @start.bump(:month) if Token.token_types(@tokens).same?([:month])
+      @next = @start.bump(:year) if Token.token_types(@tokens).same?([:year])
     end
 
     def guess_weekday
-      @next = chronic_parse_with_start("#{token_of_type(:weekday).start.to_s}") if token_types.same?([:weekday])
+      @next = chronic_parse_with_start("#{Token.token_of_type(:weekday, @tokens).start.to_s}") if Token.token_types(@tokens).same?([:weekday])
     end
 
     def guess_month_names
-      @next = chronic_parse_with_start("#{Date::MONTHNAMES[token_of_type(:month_name).start]} 1") if token_types.same?([:month_name])
+      @next = chronic_parse_with_start("#{Date::MONTHNAMES[Token.token_of_type(:month_name, @tokens).start]} 1") if Token.token_types(@tokens).same?([:month_name])
     end
 
     def guess_number_and_unit
-      @next = @start.bump(:day, token_of_type(:number).interval) if token_types.same?([:number, :day])
-      @next = @start.bump(:week, token_of_type(:number).interval) if token_types.same?([:number, :week])
-      @next = @start.bump(:month, token_of_type(:number).interval) if token_types.same?([:number, :month])
-      @next = @start.bump(:year, token_of_type(:number).interval) if token_types.same?([:number, :year])
-      @next = chronic_parse_with_start("#{token_of_type(:month_name).word} #{token_of_type(:number).start}") if token_types.same?([:number, :month_name])
-      @next = chronic_parse_with_start("#{token_of_type(:specific_year).word}-#{token_of_type(:month_name).start}-#{token_of_type(:number).start}") if token_types.same?([:number, :month_name, :specific_year])
+      @next = @start.bump(:day, Token.token_of_type(:number, @tokens).interval) if Token.token_types(@tokens).same?([:number, :day])
+      @next = @start.bump(:week, Token.token_of_type(:number, @tokens).interval) if Token.token_types(@tokens).same?([:number, :week])
+      @next = @start.bump(:month, Token.token_of_type(:number, @tokens).interval) if Token.token_types(@tokens).same?([:number, :month])
+      @next = @start.bump(:year, Token.token_of_type(:number, @tokens).interval) if Token.token_types(@tokens).same?([:number, :year])
+      @next = chronic_parse_with_start("#{Token.token_of_type(:month_name, @tokens).word} #{Token.token_of_type(:number, @tokens).start}") if Token.token_types(@tokens).same?([:number, :month_name])
+      @next = chronic_parse_with_start("#{Token.token_of_type(:specific_year, @tokens).word}-#{Token.token_of_type(:month_name, @tokens).start}-#{Token.token_of_type(:number, @tokens).start}") if Token.token_types(@tokens).same?([:number, :month_name, :specific_year])
     end
 
     def guess_ordinal
-      @next = handle_same_day_chronic_issue(@start.year, @start.month, token_of_type(:ordinal).start) if token_types.same?([:ordinal])
+      @next = handle_same_day_chronic_issue(@start.year, @start.month, Token.token_of_type(:ordinal, @tokens).start) if Token.token_types(@tokens).same?([:ordinal])
     end
 
     def guess_ordinal_and_unit
-      @next = handle_same_day_chronic_issue(@start.year, token_of_type(:month_name).start, token_of_type(:ordinal).start) if token_types.same?([:ordinal, :month_name])
-      @next = handle_same_day_chronic_issue(@start.year, @start.month, token_of_type(:ordinal).start) if token_types.same?([:ordinal, :month])
-      @next = handle_same_day_chronic_issue(token_of_type(:specific_year).word, token_of_type(:month_name).start, token_of_type(:ordinal).start) if token_types.same?([:ordinal, :month_name, :specific_year])
+      @next = handle_same_day_chronic_issue(@start.year, Token.token_of_type(:month_name, @tokens).start, Token.token_of_type(:ordinal, @tokens).start) if Token.token_types(@tokens).same?([:ordinal, :month_name])
+      @next = handle_same_day_chronic_issue(@start.year, @start.month, Token.token_of_type(:ordinal, @tokens).start) if Token.token_types(@tokens).same?([:ordinal, :month])
+      @next = handle_same_day_chronic_issue(Token.token_of_type(:specific_year, @tokens).word, Token.token_of_type(:month_name, @tokens).start, Token.token_of_type(:ordinal, @tokens).start) if Token.token_types(@tokens).same?([:ordinal, :month_name, :specific_year])
 
-      if token_types.same?([:ordinal, :weekday, :month_name])
-        @next = chronic_parse_with_start("#{token_of_type(:ordinal).word} #{token_of_type(:weekday).start.to_s} in #{Date::MONTHNAMES[token_of_type(:month_name).start]}")
-        @next = handle_same_day_chronic_issue(@start.year, token_of_type(:month_name).start, token_of_type(:ordinal).start) if @next.to_date == @start.to_date
+      if Token.token_types(@tokens).same?([:ordinal, :weekday, :month_name])
+        @next = chronic_parse_with_start("#{Token.token_of_type(:ordinal, @tokens).word} #{Token.token_of_type(:weekday, @tokens).start.to_s} in #{Date::MONTHNAMES[Token.token_of_type(:month_name, @tokens).start]}")
+        @next = handle_same_day_chronic_issue(@start.year, Token.token_of_type(:month_name, @tokens).start, Token.token_of_type(:ordinal, @tokens).start) if @next.to_date == @start.to_date
       end
 
-      if token_types.same?([:ordinal, :weekday, :month])
-        @next = chronic_parse_with_start("#{token_of_type(:ordinal).word} #{token_of_type(:weekday).start.to_s} in #{Date::MONTHNAMES[get_next_month(token_of_type(:ordinal).start)]}")
-        @next = handle_same_day_chronic_issue(@start.year, @start.month, token_of_type(:ordinal).start) if @next.to_date == @start.to_date
+      if Token.token_types(@tokens).same?([:ordinal, :weekday, :month])
+        word        = Token.token_of_type(:ordinal, @tokens).word
+        weekday       = Token.token_of_type(:weekday, @tokens).start
+        start        = Token.token_of_type(:ordinal, @tokens).start
+        next_month  = Helpers.get_next_month(word, @start)
+        month       = Date::MONTHNAMES[next_month]
+        @next = chronic_parse_with_start("#{word} #{weekday.to_s} in #{month}")
       end
     end
 
@@ -77,36 +85,32 @@ module Tickle
     private
 
     def guess_special_other
-      @next = @start.bump(:day, 2) if token_types.same?([:special, :day]) && token_of_type(:special).start == :other
-      @next = @start.bump(:week, 2)  if token_types.same?([:special, :week]) && token_of_type(:special).start == :other
-      @next = chronic_parse_with_start('2 months from now') if token_types.same?([:special, :month]) && token_of_type(:special).start == :other
-      @next = chronic_parse_with_start('2 years from now') if token_types.same?([:special, :year]) && token_of_type(:special).start == :other
+      @next = @start.bump(:day, 2) if Token.token_types(@tokens).same?([:special, :day]) && Token.token_of_type(:special, @tokens).start == :other
+      @next = @start.bump(:week, 2)  if Token.token_types(@tokens).same?([:special, :week]) && Token.token_of_type(:special, @tokens).start == :other
+      @next = chronic_parse_with_start('2 months from now') if Token.token_types(@tokens).same?([:special, :month]) && Token.token_of_type(:special, @tokens).start == :other
+      @next = chronic_parse_with_start('2 years from now') if Token.token_types(@tokens).same?([:special, :year]) && Token.token_of_type(:special, @tokens).start == :other
     end
 
     def guess_special_beginning
-      if token_types.same?([:special, :week]) && token_of_type(:special).start == :beginning then @next = chronic_parse_with_start('Sunday'); end
-      if token_types.same?([:special, :month]) && token_of_type(:special).start == :beginning then @next = Date.civil(@start.year, @start.month + 1, 1); end
-      if token_types.same?([:special, :year]) && token_of_type(:special).start == :beginning then @next = Date.civil(@start.year+1, 1, 1); end
+      if Token.token_types(@tokens).same?([:special, :week]) && Token.token_of_type(:special, @tokens).start == :beginning then @next = chronic_parse_with_start('Sunday'); end
+      if Token.token_types(@tokens).same?([:special, :month]) && Token.token_of_type(:special, @tokens).start == :beginning then @next = Date.civil(@start.year, @start.month + 1, 1); end
+      if Token.token_types(@tokens).same?([:special, :year]) && Token.token_of_type(:special, @tokens).start == :beginning then @next = Date.civil(@start.year+1, 1, 1); end
     end
 
     def guess_special_end
-      if token_types.same?([:special, :week]) && token_of_type(:special).start == :end then @next = chronic_parse_with_start('Saturday'); end
-      if token_types.same?([:special, :month]) && token_of_type(:special).start == :end then @next = Date.civil(@start.year, @start.month, -1); end
-      if token_types.same?([:special, :year]) && token_of_type(:special).start == :end then @next = Date.new(@start.year, 12, 31); end
+      if Token.token_types(@tokens).same?([:special, :week]) && Token.token_of_type(:special, @tokens).start == :end then @next = chronic_parse_with_start('Saturday'); end
+      if Token.token_types(@tokens).same?([:special, :month]) && Token.token_of_type(:special, @tokens).start == :end then @next = Date.civil(@start.year, @start.month, -1); end
+      if Token.token_types(@tokens).same?([:special, :year]) && Token.token_of_type(:special, @tokens).start == :end then @next = Date.new(@start.year, 12, 31); end
     end
 
     def guess_special_middle
-      if token_types.same?([:special, :week]) && token_of_type(:special).start == :middle then @next = chronic_parse_with_start('Wednesday'); end
-      if token_types.same?([:special, :month]) && token_of_type(:special).start == :middle then
+      if Token.token_types(@tokens).same?([:special, :week]) && Token.token_of_type(:special, @tokens).start == :middle then @next = chronic_parse_with_start('Wednesday'); end
+      if Token.token_types(@tokens).same?([:special, :month]) && Token.token_of_type(:special, @tokens).start == :middle then
         @next = (@start.day > 15 ? Date.civil(@start.year, @start.month + 1, 15) : Date.civil(@start.year, @start.month, 15))
       end
-      if token_types.same?([:special, :year]) && token_of_type(:special).start == :middle then
+      if Token.token_types(@tokens).same?([:special, :year]) && Token.token_of_type(:special, @tokens).start == :middle then
         @next = (@start.day > 15 && @start.month > 6 ? Date.new(@start.year+1, 6, 15) : Date.new(@start.year, 6, 15))
       end
-    end
-
-    def token_of_type(type)
-      @tokens.detect {|token| token.type == type}
     end
 
     private
