@@ -1,5 +1,8 @@
 module Tickle
 
+  require 'numerizer'
+  require_relative "repeater.rb"
+
   # An extended String
   class Token < ::String
     attr_accessor :original
