@@ -128,22 +128,176 @@ describe "Parsing" do
         it { should == expected }
       end
 
-      context "February" do
-        subject{ Tickle.parse('February', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2021-02-01 12:00:00 +0000"), :expression=>"february", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
+      context "Given that now is in the future, 2020-04-01 00:00:00 +0000" do
+        context "February" do
+          subject{ Tickle.parse('February', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2021-02-01 12:00:00 +0000"), :expression=>"february", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
 
-      context "May" do
-        subject{ Tickle.parse('May', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-05-01 12:00:00 +0000"), :expression=>"may", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
+        context "May" do
+          subject{ Tickle.parse('May', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-05-01 12:00:00 +0000"), :expression=>"may", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
 
-      context "june" do
-        subject{ Tickle.parse('june', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-06-01 12:00:00 +0000"), :expression=>"june", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
+        context "june" do
+          subject{ Tickle.parse('june', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-06-01 12:00:00 +0000"), :expression=>"june", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "beginning of the month" do
+          subject{ Tickle.parse('beginning of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-05-01 00:00:00 +0000"), :expression=>"beginning of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "middle of the month" do
+          subject{ Tickle.parse('middle of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-04-15 00:00:00 +0000"), :expression=>"middle of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "end of the month" do
+          subject{ Tickle.parse('end of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-04-30 00:00:00 +0000"), :expression=>"end of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "beginning of the year" do
+          subject{ Tickle.parse('beginning of the year', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2021-01-01 00:00:00 +0000"), :expression=>"beginning of the year", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "middle of the year" do
+          subject{ Tickle.parse('middle of the year', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-06-15 00:00:00 +0000"), :expression=>"middle of the year", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "end of the year" do
+          subject{ Tickle.parse('end of the year', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-12-31 00:00:00 +0000"), :expression=>"end of the year", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the 3rd of May" do
+          subject{ Tickle.parse('the 3rd of May', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-05-03 00:00:00 +0000"), :expression=>"the 3rd of may", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the 3rd of February" do
+          subject{ Tickle.parse('the 3rd of February', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2021-02-03 00:00:00 +0000"), :expression=>"the 3rd of february", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the 3rd of February 2022" do
+          subject{ Tickle.parse('the 3rd of February 2022', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2022-02-03 00:00:00 +0000"), :expression=>"the 3rd of february 2022", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the 3rd of Feb 2022" do
+          subject{ Tickle.parse('the 3rd of Feb 2022', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2022-02-03 00:00:00 +0000"), :expression=>"the 3rd of feb 2022", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the 4th of the month" do
+          subject{ Tickle.parse('the 4th of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-04-04 00:00:00 +0000"), :expression=>"the 4th of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the 10th of the month" do
+          subject{ Tickle.parse('the 10th of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-04-10 00:00:00 +0000"), :expression=>"the 10th of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the tenth of the month" do
+          subject{ Tickle.parse('the tenth of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-04-10 00:00:00 +0000"), :expression=>"the tenth of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "first" do
+          subject{ Tickle.parse('first', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-05-01 00:00:00 +0000"), :expression=>"first", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the first of the month" do
+          subject{ Tickle.parse('the first of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-05-01 00:00:00 +0000"), :expression=>"the first of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the thirtieth" do
+          subject{ Tickle.parse('the thirtieth', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-04-30 00:00:00 +0000"), :expression=>"the thirtieth", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the fifth" do
+          subject{ Tickle.parse('the fifth', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-04-05 00:00:00 +0000"), :expression=>"the fifth", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the 1st Wednesday of the month" do
+          subject{ Tickle.parse('the 1st wednesday of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) {
+            {:next=>Time.parse("2020-04-01 12:00:00 +0000"), :expression=>"the 1st wednesday of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil}
+          }
+          it { should == expected }
+        end
+
+        context "the 3rd Sunday of May" do
+          subject{ Tickle.parse('the 3rd Sunday of May', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-05-17 12:00:00 +0000"), :expression=>"the 3rd sunday of may", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the 3rd Sunday of the month" do
+          subject{ Tickle.parse('the 3rd Sunday of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-04-19 12:00:00 +0000"), :expression=>"the 3rd sunday of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the 23rd of June" do
+          subject{ Tickle.parse('the 23rd of June', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-06-23 00:00:00 +0000"), :expression=>"the 23rd of june", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the twenty third of June" do
+          subject{ Tickle.parse('the twenty third of June', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-06-23 00:00:00 +0000"), :expression=>"the twenty third of june", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the thirty first of July" do
+          subject{ Tickle.parse('the thirty first of July', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-07-31 00:00:00 +0000"), :expression=>"the thirty first of july", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the twenty first" do
+          subject{ Tickle.parse('the twenty first', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-04-21 00:00:00 +0000"), :expression=>"the twenty first", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+
+        context "the twenty first of the month" do
+          subject{ Tickle.parse('the twenty first of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          let(:expected) { {:next=>Time.parse("2020-04-21 00:00:00 +0000"), :expression=>"the twenty first of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
       end
 
       context "beginning of the week" do
@@ -161,156 +315,6 @@ describe "Parsing" do
       context "end of the week" do
         subject{ Tickle.parse('end of the week') }
         let(:expected) { {:next=>Time.parse("2010-05-15 12:00:00 +0000"), :expression=>"end of the week", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "beginning of the month" do
-        subject{ Tickle.parse('beginning of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-05-01 00:00:00 +0000"), :expression=>"beginning of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "middle of the month" do
-        subject{ Tickle.parse('middle of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-04-15 00:00:00 +0000"), :expression=>"middle of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "end of the month" do
-        subject{ Tickle.parse('end of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-04-30 00:00:00 +0000"), :expression=>"end of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "beginning of the year" do
-        subject{ Tickle.parse('beginning of the year', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2021-01-01 00:00:00 +0000"), :expression=>"beginning of the year", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "middle of the year" do
-        subject{ Tickle.parse('middle of the year', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-06-15 00:00:00 +0000"), :expression=>"middle of the year", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "end of the year" do
-        subject{ Tickle.parse('end of the year', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-12-31 00:00:00 +0000"), :expression=>"end of the year", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the 3rd of May" do
-        subject{ Tickle.parse('the 3rd of May', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-05-03 00:00:00 +0000"), :expression=>"the 3rd of may", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the 3rd of February" do
-        subject{ Tickle.parse('the 3rd of February', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2021-02-03 00:00:00 +0000"), :expression=>"the 3rd of february", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the 3rd of February 2022" do
-        subject{ Tickle.parse('the 3rd of February 2022', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2022-02-03 00:00:00 +0000"), :expression=>"the 3rd of february 2022", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the 3rd of Feb 2022" do
-        subject{ Tickle.parse('the 3rd of Feb 2022', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2022-02-03 00:00:00 +0000"), :expression=>"the 3rd of feb 2022", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the 4th of the month" do
-        subject{ Tickle.parse('the 4th of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-04-04 00:00:00 +0000"), :expression=>"the 4th of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the 10th of the month" do
-        subject{ Tickle.parse('the 10th of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-04-10 00:00:00 +0000"), :expression=>"the 10th of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the tenth of the month" do
-        subject{ Tickle.parse('the tenth of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-04-10 00:00:00 +0000"), :expression=>"the tenth of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "first" do
-        subject{ Tickle.parse('first', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-05-01 00:00:00 +0000"), :expression=>"first", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the first of the month" do
-        subject{ Tickle.parse('the first of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-05-01 00:00:00 +0000"), :expression=>"the first of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the thirtieth" do
-        subject{ Tickle.parse('the thirtieth', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-04-30 00:00:00 +0000"), :expression=>"the thirtieth", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the fifth" do
-        subject{ Tickle.parse('the fifth', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-04-05 00:00:00 +0000"), :expression=>"the fifth", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the 1st Wednesday of the month" do
-        subject{ Tickle.parse('the 1st Wednesday of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-05-01 00:00:00 +0000"), :expression=>"the 1st wednesday of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the 3rd Sunday of May" do
-        subject{ Tickle.parse('the 3rd Sunday of May', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-05-17 12:00:00 +0000"), :expression=>"the 3rd sunday of may", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the 3rd Sunday of the month" do
-        subject{ Tickle.parse('the 3rd Sunday of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-04-19 12:00:00 +0000"), :expression=>"the 3rd sunday of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the 23rd of June" do
-        subject{ Tickle.parse('the 23rd of June', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-06-23 00:00:00 +0000"), :expression=>"the 23rd of june", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the twenty third of June" do
-        subject{ Tickle.parse('the twenty third of June', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-06-23 00:00:00 +0000"), :expression=>"the twenty third of june", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the thirty first of July" do
-        subject{ Tickle.parse('the thirty first of July', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-07-31 00:00:00 +0000"), :expression=>"the thirty first of july", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the twenty first" do
-        subject{ Tickle.parse('the twenty first', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-04-21 00:00:00 +0000"), :expression=>"the twenty first", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
-        it { should == expected }
-      end
-
-      context "the twenty first of the month" do
-        subject{ Tickle.parse('the twenty first of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
-        let(:expected) { {:next=>Time.parse("2020-04-21 00:00:00 +0000"), :expression=>"the twenty first of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil} }
         it { should == expected }
       end
 
