@@ -64,6 +64,19 @@ describe "Token" do
     its(:first) { should be_a_kind_of Token }
   end
 
+
+  describe "scan" do
+    context "Given an invalid argument" do
+      it {
+        expect {Token.scan Token.tokenize 9999}.to raise_error ArgumentError
+      }
+    end
+    context "Given a valid argument (tokens)" do
+      subject { Token.scan! Token.tokenize "Next Monday" }
+      it { should == ["Next", "Monday"] }
+    end
+  end
+
 end
 
 end
