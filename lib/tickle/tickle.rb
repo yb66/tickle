@@ -285,27 +285,6 @@ module Tickle
   end
 
 
-  class Token
-    attr_accessor :original, :word, :type, :interval, :start
-
-
-    def initialize(original, word=nil, type=nil, start=nil, interval=nil)
-      @original = original
-      @word = word
-      @type = type
-      @interval = interval
-      @start = start
-    end
-
-
-    # Updates an existing token.  Mostly used by the repeater class.
-    def update(type, start=nil, interval=nil)
-      @start = start
-      @type = type
-      @interval = interval
-    end
-  end
-
 
   # This exception is raised if there is an issue with the parsing
   # output from the date expression provided
