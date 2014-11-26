@@ -25,11 +25,17 @@ module Tickle
     end
 
 
-    # Updates an existing token.  Mostly used by the repeater class.
-    def update!(type, start=nil, interval=nil)
-      @start = start
-      @type = type
-      @interval = interval
+    def update!(options={})
+      options = {
+        :start    =>  nil,
+        :interval =>  nil,
+      }.merge( options )
+      fail ArgumentError, "Token#update! must be passed a 'type'" if options.nil? or options.empty? or not options.has_key?(:type) or options[:type].nil?
+
+      @type = options[:type]
+      @start = options[:start]
+      @interval = options[:interval]
+      self
     end
 
 
