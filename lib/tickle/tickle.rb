@@ -77,11 +77,9 @@ module Tickle
         # put the text into a normal format to ease scanning using Chronic
         event = pre_filter(event)
 
-        # split into tokens
-        @tokens = Token.tokenize(event)
-
+        # split into tokens and then
         # process each original word for implied word
-        post_tokenize
+        @tokens = post_tokenize Token.tokenize(event)
 
         # scan the tokens with each token scanner
         @tokens = Repeater.scan(@tokens)
@@ -182,11 +180,14 @@ module Tickle
     end
 
 
+
     # normalizes each token
-    def post_tokenize
-      @tokens.each do |token|
+    def post_tokenize(tokens)
+      _tokens = tokens.map(&:clone)
+      _tokens.each do |token|
         token.normalize!
       end
+      _tokens
     end
 
 
