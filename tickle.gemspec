@@ -21,6 +21,7 @@ Gem::Specification.new do |s|
   s.require_paths = ["lib"]
 
   s.add_dependency "numerizer", "~> 0.2.0"
-  s.add_dependency "chronic", "~> 0.10.2"
+  s.add_dependency "chronic",   "~> 0.10.2"
+  s.add_dependency "texttube",  "~> 6.0.0"
 end
 
