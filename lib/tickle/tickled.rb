@@ -1,27 +1,35 @@
 require 'chronic'
+require 'texttube/base'
+require_relative "filters.rb"
+require 'chronic'
 
 module Tickle
+      
 
 
   # Contains the initial input and the result of parsing it.
-  class Tickled < ::Hash
+  class Tickled < TextTube::Base
+    register Filters
 
     # @param [String] asked The string Tickle should parse.
     # @param [Hash] options
     # @see Tickle.parse for specific options
     # @see ::Hash#new
-    def initialize(asked, options=nil, &block)
-      # get options and set defaults if necessary.
-      self[:start]      = Time.now
-      self[:next_only]  = false
-      self[:until]      = nil
-      self[:now]        = Time.now
-      self.asked        = asked # trigger checks during assignment
+    def initialize(asked, options={}, &block)
+      fail ArgumentError, "You must pass a string to Tickled.new" if asked.nil?
+
+
+      default_options = {
+        :start      => Time.now,
+        :next_only  => false,
+        :until      => nil,
+        :now        => Time.now,
+      }
 
       unless options.nil? || options.empty?
         # ensure the specified options are valid
         options.keys.each do |key|
-          fail(ArgumentError, "#{key} is not a valid option key.") unless self.keys.include?(key)
+          fail(ArgumentError, "#{key} is not a valid option key.") unless default_options.keys.include?(key)
         end
 
         [:start,:until,:now].each do |key|
@@ -29,10 +37,30 @@ module Tickle
             test_for_correctness options[key], key
           end
         end
-
-        merge!(options)
       end
-      super()
+
+      t = 
+        if asked.respond_to?(:to_time)
+          asked
+        elsif (t = Time.parse(asked) rescue nil) # a legitimate use!
+          t
+        elsif (t = Chronic.parse("#{asked}") rescue nil) # another legitimate use!
+          t
+        end
+
+      unless t.nil?
+        define_singleton_method :to_time do
+          @as_time ||= t
+        end
+      end
+
+      @opts = default_options.merge(options)
+      super(asked.to_s)
+    end
+
+
+    def asked
+      self
     end
 
 
@@ -45,20 +73,20 @@ module Tickle
     end
 
     def now=( value )
-      self[:now] = value
+      @opts[:now] = value
     end
 
     def now
-      self[:now]
+      @opts[:now]
     end
 
     def next_only=( value )
-      self[:next_only] = value
+      @opts[:next_only] = value
     end
 
 
     def next_only?
-      self[:next_only]
+      @opts[:next_only]
     end
 
 
@@ -67,46 +95,80 @@ module Tickle
     def test_for_correctness( v, key )
       # Must be be a time or a string or be able to convert to a time
       # If it is a string, must parse ok by Chronic
-      throw :invalid_date_expression, "The value (#{v}) given for :#{key} does not appear to be a valid date or time." unless v.respond_to?(:to_time) or (v.respond_to?(:downcase) and ::Chronic.parse(v))
+      fail ArgumentError, "The value (#{v}) given for :#{key} does not appear to be a valid date or time." unless v.respond_to?(:to_time) or (v.respond_to?(:downcase) and ::Chronic.parse(v))
     end
 
 
     def asked
-      self[:asked]
+      self
     end
 
 
     # @param [Date,Time,String]
     def asked=( text )
-      test_for_correctness text, :asked
-      self[:asked] = text
+      #test_for_correctness text, :asked
+      @opts[:asked] = text
     end
 
     def start
-      self[:start] ||= Time.now
+      @opts[:start] ||= Time.now
     end
 
     def start=( value )
-      self[:start] = test_for_correctness value, :start
+      @opts[:start] = test_for_correctness value, :start
     end
 
     def until
-      self[:until] ||= Time.now
+      @opts[:until] ||= Tickled.new( Time.now )
     end
 
     def until=( value )
-      self[:until] = test_for_correctness value, :until
+      @opts[:until] = test_for_correctness value, :until
     end
-
 
 
     [:starting, :ending, :event].each do |meth|
       define_method meth do
-        self[meth]
+        @opts[meth] 
       end
       define_method "#{meth}=" do |value|
-        self[meth] = value
+        @opts[meth] = Tickled.new value
       end
     end
+
+
+    def event
+      @opts[:event] ||= self
+    end
+    def event= value
+      @opts[:event] = Tickled.new value
+    end
+
+
+    def filtered=(filtered_text)
+      @filtered = filtered_text
+    end
+
+    def filtered
+      @filtered
+    end
+
+
+    def to_s
+      self
+    end
+  
+    def blank?
+      if respond_to? :empty?
+        empty? || !self
+      elsif respond_to? :localtime
+        false
+      end 
+    end
+
+#     def inspect
+#       "#{self} #{@opts.inspect}"
+#     end
+
   end
 end
