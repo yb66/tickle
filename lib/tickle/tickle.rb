@@ -48,8 +48,7 @@ module Tickle
     def _parse( tickled )
 
       # check to see if this event starts some other time and reset now
-      event = scan_expression(text, options)
-
+      scan_expression! tickled
 
       fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur in the past for a future event") if @start && @start.to_date < Date.today
       fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur after the end date") if @until && @start.to_date > @until.to_date
