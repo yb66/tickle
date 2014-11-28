@@ -80,8 +80,7 @@ module Tickle
         best_guess = _guess || chronic_parse(tickled.event) # TODO fix this call 
       end
 
-      fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
-
+      fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && (best_guess.to_date > @until.to_date)
       if !best_guess
         return nil
       elsif !tickled.next_only?
