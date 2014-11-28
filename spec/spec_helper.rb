@@ -30,10 +30,12 @@ RSpec.configure do |config|
   tz = ENV["TZ"]
   config.before(:all, :frozen => true) do
     Timecop.freeze Time_now
-    ENV["TZ"] = "UTC"  
+    ENV["TZ"] = "UTC"
   end
   config.after(:all, :frozen => true) do
     Timecop.return
     ENV["TZ"] = tz
   end
 end
+
+warn "Actual Time now => #{Time.now}"

@@ -25,6 +25,7 @@ module Tickle
   require 'numerizer'
   require_relative "helpers.rb"
   require_relative "token.rb"
+  require_relative "tickled.rb"
 
 
   class << self
@@ -44,42 +45,25 @@ module Tickle
     #    Tickle.parse("every Tuesday")
     #    # => {:next=>2014-08-26 12:00:00 0100, :expression=>"tuesday", :starting=>2014-08-25 16:31:12 0100, :until=>nil}
     #
-    def _parse(text, specified_options = {})
-      # get options and set defaults if necessary.  Ability to set now is mostly for debugging
-      default_options = {:start => Time.now, :next_only => false, :until => nil, :now => Time.now}
-      options = default_options.merge specified_options
-
-      # ensure an expression was provided
-      fail(ArgumentError, 'date expression is required') unless text
-
-      # ensure the specified options are valid
-      specified_options.keys.each do |key|
-        fail(ArgumentError, "#{key} is not a valid option key.") unless default_options.keys.include?(key)
-      end
-      fail(ArgumentError, ':start specified is not a valid datetime.') unless  (is_date(specified_options[:start]) || Chronic.parse(specified_options[:start])) if specified_options[:start]
-
-      # check to see if a valid datetime was passed
-      return text if text.is_a?(Date) ||  text.is_a?(Time)
+    def _parse( tickled )
 
       # check to see if this event starts some other time and reset now
-      event = scan_expression(text, options)
+      scan_expression! tickled
 
-
-      # => ** this is mostly for testing. Bump by 1 day if today (or in the past for testing)
       fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur in the past for a future event") if @start && @start.to_date < Date.today
       fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur after the end date") if @until && @start.to_date > @until.to_date
 
+
       # no need to guess at expression if the start_date is in the future
       best_guess = nil
-      if @start.to_date > options[:now].to_date
+      if @start.to_date > tickled.now.to_date
         best_guess = @start
       else
         # put the text into a normal format to ease scanning using Chronic
-        event = pre_filter(event)
-
+        tickled.filtered = tickled.event.filter
         # split into tokens and then
         # process each original word for implied word
-        @tokens = post_tokenize Token.tokenize(event)
+        @tokens = post_tokenize Token.tokenize(tickled.filtered)
 
         # scan the tokens with each token scanner
         @tokens = Token.scan!(@tokens)
@@ -92,15 +76,14 @@ module Tickle
 
         # if we can't guess it maybe chronic can
         _guess = guess(@tokens, @start)
-        best_guess = _guess || chronic_parse(event) # TODO fix this call 
+        best_guess = _guess || chronic_parse(tickled.event) # TODO fix this call 
       end
 
-      fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
-
+      fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && (best_guess.to_date > @until.to_date)
       if !best_guess
         return nil
-      elsif options[:next_only] != true
-        return {:next => best_guess.to_time, :expression => event.strip, :starting => @start, :until => @until}
+      elsif !tickled.next_only?
+        return {:next => best_guess.to_time, :expression => tickled.event.filter, :starting => @start, :until => @until}
       else
         return best_guess
       end
@@ -108,78 +91,68 @@ module Tickle
 
 
     # scans the expression for a variety of natural formats, such as 'every thursday starting tomorrow until May 15th
-    def scan_expression(text, options)
-      starting = ending = nil
-      case text
-        when Patterns::START_EVERY_REGEX
-          starting = text.match(Patterns::START_EVERY_REGEX)[:start].strip
-          text = text.match(Patterns::START_EVERY_REGEX)[:event].strip
+    def scan_expression!(tickled)
+      starting,ending,event = nil, nil, nil
+      if (md = Patterns::START_EVERY_REGEX.match tickled)
+          starting = md[:start].strip
+          text = md[:event].strip
           event, ending = process_for_ending(text)
-        when Patterns::EVERY_START_REGEX
-          event = text.match(Patterns::EVERY_START_REGEX)[:event].strip
-          text = text.match(Patterns::EVERY_START_REGEX)[:start].strip
+      elsif (md = Patterns::EVERY_START_REGEX.match tickled)
+          event = md[:event].strip
+          text = md[:start].strip
           starting, ending = process_for_ending(text)
-        when Patterns::START_ENDING_REGEX
-          starting = text.match(Patterns::START_ENDING_REGEX)[:start].strip
-          ending = text.match(Patterns::START_ENDING_REGEX)[:finish].strip
+      elsif (md = Patterns::START_ENDING_REGEX.match tickled)
+          starting = md[:start].strip
+          ending = md[:finish].strip
           event = 'day'
         else
           event, ending = process_for_ending(text)
       end
-
+      tickled.starting  = starting  unless starting.nil?
+      tickled.event     = event     unless event.nil?
+      tickled.ending    = ending    unless ending.nil?
       # they gave a phrase so if we can't interpret then we need to raise an error
-      if starting
-        @start = chronic_parse(pre_filter(starting),options, :start)
+      if tickled.starting && !tickled.starting.to_s.blank?
+        @start = chronic_parse(tickled.starting,tickled, :start)
         if @start
           @start.to_time
         else
-          fail(InvalidDateExpression,"the starting date expression \"#{starting}\" could not be interpretted")
+          fail(InvalidDateExpression,"the starting date expression \"#{tickled.starting}\" could not be interpretted")
         end
       else
-        @start = options[:start].to_time rescue nil
+        @start = tickled.start && tickled.start.to_time
       end
 
-      if ending
-        @until = chronic_parse(pre_filter(ending),options, :until)
+
+      if tickled.ending && !tickled.ending.blank?
+        @until = chronic_parse(tickled.ending.filter,tickled, :until)
         if @until
           @until.to_time
         else
-          fail(InvalidDateExpression,"the ending date expression \"#{ending}\" could not be interpretted")
+          fail(InvalidDateExpression,"the ending date expression \"#{tickled.ending}\" could not be interpretted")
         end
       else
-        @until = options[:until].to_time rescue nil
+        @until = 
+          if  tickled.starting && !tickled.starting.to_s.blank?
+            if tickled.until && !tickled.until.to_s.blank?
+              if tickled.until.to_time > tickled.starting.to_time
+                tickled.until.to_time
+              end
+            end
+          end
       end
 
       @next = nil
-
-      return event
+      tickled
     end
 
 
     # process the remaining expression to see if an until, end, ending is specified
     def process_for_ending(text)
-      if text =~ Patterns::PROCESS_FOR_ENDING
-        return text.match(Patterns::PROCESS_FOR_ENDING)[:target], text.match(Patterns::PROCESS_FOR_ENDING)[:ending]
-      else
-        return text, nil
-      end
+      (md = Patterns::PROCESS_FOR_ENDING.match text) ?
+        [ md[:target], md[:ending] ] :
+        [text, nil]
     end
-
-
-    # Normalize natural string removing prefix language
-    def pre_filter(text)
-      return nil unless text
-
-      text.gsub!(/every(\s)?/, '')
-      text.gsub!(/each(\s)?/, '')
-      text.gsub!(/repeat(s|ing)?(\s)?/, '')
-      text.gsub!(/on the(\s)?/, '')
-      text.gsub!(/([^\w\d\s])+/, '')
-      text.downcase.strip
-      text = normalize_us_holidays(text)
-    end
-
-
 
     # normalizes each token
     def post_tokenize(tokens)
@@ -188,41 +161,6 @@ module Tickle
         token.normalize!
       end
       _tokens
-    end
-
-
-    # Converts natural language US Holidays into a date expression to be
-    # parsed.
-    def normalize_us_holidays(text)
-      normalized_text = text.to_s.downcase
-      normalized_text.gsub!(/\bnew\syear'?s?(\s)?(day)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bnew\syear'?s?(\s)?(eve)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bm(artin\s)?l(uther\s)?k(ing)?(\sday)?\b/){|md| $1 }
-      normalized_text.gsub!(/\binauguration(\sday)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bpresident'?s?(\sday)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bmemorial\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\bindepend(e|a)nce\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\blabor\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\bcolumbus\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\bveterans?\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\bthanksgiving(\sday)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bchristmas\seve\b/){|md| $1 }
-      normalized_text.gsub!(/\bchristmas(\sday)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bsuper\sbowl(\ssunday)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bgroundhog(\sday)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bvalentine'?s?(\sday)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bs(ain)?t\spatrick'?s?(\sday)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bapril\sfool'?s?(\sday)?\b/){|md| $1 }
-      normalized_text.gsub!(/\bearth\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\barbor\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\bcinco\sde\smayo\b/){|md| $1 }
-      normalized_text.gsub!(/\bmother'?s?\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\bflag\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\bfather'?s?\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\bhalloween\b/){|md| $1 }
-      normalized_text.gsub!(/\belection\sday\b/){|md| $1 }
-      normalized_text.gsub!(/\bkwanzaa\b/){|md| $1 }
-      normalized_text
     end
 
 
@@ -252,12 +190,16 @@ module Tickle
     # slightly modified chronic parser to ensure that the date found is in the future
     # first we check to see if an explicit date was passed and, if so, dont do anything.
     # if, however, a date expression was passed we evaluate and shift forward if needed
-    def chronic_parse(exp, options, start_or_until)
+    def chronic_parse(exp, tickled, start_or_until)
       exp = Ordinal.new exp
-      result = 
-        Chronic.parse(exp.ordinal_as_number, :now => options[:now]) ||
-        (start_or_until && options[start_or_until]) ||
-        (start_or_until == :start && options[:now])
+      result =
+        if r = Chronic.parse(exp.ordinal_as_number, :now => tickled.now)
+          r
+        elsif r = (start_or_until && tickled[start_or_until])
+          r
+        elsif r = (start_or_until == :start && tickled.now)
+          r
+        end
       if result && result.to_time < Time.now
         result = Time.local(result.year + 1, result.month, result.day, result.hour, result.min, result.sec)
       end

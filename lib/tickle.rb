@@ -16,6 +16,7 @@ require 'chronic'
 require 'tickle/tickle'
 require 'tickle/handler'
 require 'tickle/repeater'
+require_relative "tickle/tickled.rb"
 require_relative "ext/array.rb"
 require_relative "ext/date_and_time.rb"
 require_relative "ext/string.rb"
@@ -24,8 +25,14 @@ require_relative "ext/string.rb"
 module Tickle
 
 
-  def self.parse(text, specified_options = {})
-    _parse text, specified_options
+  def self.parse(asked, options = {})
+    # check to see if a datetime was passed
+    # if so, give it back
+    # TODO Consider converting to a Tickled
+    return tickled if asked.respond_to? :to_time
+
+    tickled = Tickled.new asked, options
+    _parse tickled
   end
 
 
