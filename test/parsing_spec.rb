@@ -1,8 +1,11 @@
 require_relative 'spec_helper'
 
-describe "parsing strings to get timeframes" do
+def now now = nil
+  Timecop.freeze(now) if nil
+  Time.now
+end
 
-  let(:now) { Time.now.tap { |x| Timecop.freeze x } }
+describe "parsing strings to get timeframes" do
 
   let(:parse) { ->(x) { Tickle.parse x } }
 
@@ -10,14 +13,21 @@ describe "parsing strings to get timeframes" do
 
   describe "the basics" do
 
-    ['day', 'every day'].each do |input|
-      describe "multiple examples" do
-        it "should match day" do
-          result = parse.call input
+    [
+      ['day',       now + 1.day, nil, 'day'],
+      ['every day', now + 1.day, nil, 'day'],
+    ].map { |x| Struct.new(:input, :next, :until, :expression).new(*x) }.each do |example|
+      describe "parsing" do
+        it example.input do
+          result = parse.call example.input
           date_matcher.call(result[:starting], now)
-          date_matcher.call(result[:next],     now + 1.day)
-          result[:until].nil?.must_equal true
-          result[:expression].must_equal 'day'
+          date_matcher.call(result[:next],     example.next)
+          if example.until
+            result[:until].must_equal example.until
+          else
+            result[:until].nil?.must_equal true
+          end
+          result[:expression].must_equal example.expression
         end
       end
     end
