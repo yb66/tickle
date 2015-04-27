@@ -101,7 +101,9 @@ module Tickle #:nodoc:
     def guess_special_middle
       if token_types.same?([:special, :week])  && token_of_type(:special).start == :middle then @next = chronic_parse_with_start('Wednesday'); end
       if token_types.same?([:special, :month]) && token_of_type(:special).start == :middle then
+        # this is busted
         @next = (@start.day > 15 ? Date.civil(@start.year, @start.month + 1, 15) : Date.civil(@start.year, @start.month, 15))
+        # ^^^^^^^^^^^^^^
       end
       if token_types.same?([:special, :year]) && token_of_type(:special).start == :middle then
         @next = (@start.day > 15 && @start.month > 6 ? Date.new(@start.year+1, 6, 15) : Date.new(@start.year, 6, 15))
