@@ -68,6 +68,66 @@ describe "parsing strings to get timeframes" do
 
     end
 
+    
+    describe "specific dates of the week"  do
+
+      describe "every weekday" do
+
+        describe "at the beginning of the week, midday (sunday)" do
+
+          [
+            Time.parse('2015-04-26 00:00:00 -0500'),
+          ].each do |now|
+
+            [
+              ['every Monday',    now, now + 1.day  + 12.hours,  nil,  'monday'],
+              ['every Tuesday',   now, now + 2.days + 12.hours,  nil,  'tuesday'],
+              ['every Wednesday', now, now + 3.days + 12.hours,  nil,  'wednesday'],
+              ['every Thursday',  now, now + 4.days + 12.hours,  nil,  'thursday'],
+              ['every Friday',    now, now + 5.days + 12.hours,  nil,  'friday'],
+              ['every Saturday',  now, now + 6.days + 12.hours,  nil,  'saturday'],
+              ['every Sunday',    now, now + 7.days + 12.hours,  nil,  'sunday'],
+            ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
+
+              describe example.input do
+
+                before { set_now_to now }
+
+                it 'should match the expected day' do
+                  result = parse.call example.input
+                  date_matcher.call(result[:starting], example.start)
+                  date_matcher.call(result[:next],  example.next)
+                  if example.until
+                    result[:until].must_equal example.until
+                  else
+                    result[:until].nil?.must_equal true
+                  end
+                  result[:expression].must_equal example.expression
+                end
+
+              end
+
+            end
+
+          end
+
+        end
+
+      end
+
+    #assert_date_match(@date.bump(:wday, 'Mon'), 'every Monday')
+    #assert_date_match(@date.bump(:wday, 'Wed'), 'every Wednesday')
+    #assert_date_match(@date.bump(:wday, 'Fri'), 'every Friday')
+#
+    #assert_date_match(Date.new(2021, 2, 1), 'every February', {:start => start, :now => start})
+    #assert_date_match(Date.new(2020, 5, 1), 'every May', {:start => start, :now => start})
+    #assert_date_match(Date.new(2020, 6, 1), 'every june', {:start => start, :now => start})
+#
+    #assert_date_match(@date.bump(:wday, 'Sun'), 'beginning of the week')
+    #assert_date_match(@date.bump(:wday, 'Wed'), 'middle of the week')
+    #assert_date_match(@date.bump(:wday, 'Sat'), 'end of the week')
+    end
+
   end
 
 end
