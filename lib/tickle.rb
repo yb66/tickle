@@ -88,7 +88,7 @@ class Time #:nodoc:
     when :week then
       Time.local(self.year, self.month, self.day, self.hour, self.min, self.sec) + amount.weeks
     when :month then
-      Time.local(self.year, self.month + amount, self.day, self.hour, self.min, self.sec)
+      Time.local(self.year, self.month, self.day, self.hour, self.min, self.sec) + amount.months
     when :year then
       Time.local(self.year + amount, self.month, self.day, self.hour, self.min, self.sec)
     else
