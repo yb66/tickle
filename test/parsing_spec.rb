@@ -29,6 +29,11 @@ describe "parsing strings to get timeframes" do
         ['weekly',       now, now + 1.week,  nil, 'weekly'],
         ['monthly',      now, now + 1.month, nil, 'monthly'],
         ['yearly',       now, now + 1.year,  nil, 'yearly'],
+        ###
+        ['every 3 days',   now, now + 3.days,   nil,  '3 days'],
+        ['every 3 weeks',  now, now + 3.weeks,  nil,  '3 weeks'],
+        ['every 3 months', now, now + 3.months, nil,  '3 months'],
+        ['every 3 years',  now, now + 3.years,  nil,  '3 years'],
       ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
 
         describe "parsing from #{now}" do
