@@ -18,7 +18,9 @@ describe "parsing strings to get timeframes" do
       ['every day',   now, now + 1.day,  nil, 'day'],
       ['every week',  now, now + 1.week, nil, 'week'],
     ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
+
       describe "parsing" do
+
         it example.input do
           result = parse.call example.input
           date_matcher.call(result[:starting], example.start)
@@ -30,7 +32,9 @@ describe "parsing strings to get timeframes" do
           end
           result[:expression].must_equal example.expression
         end
+
       end
+
     end
 
   end
