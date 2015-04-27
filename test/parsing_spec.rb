@@ -1,9 +1,25 @@
 require_relative 'spec_helper'
 
-describe "this gem" do
-  it "should get some love" do
-    'A'.must_equal 'A'
+describe "parsing strings to get timeframes" do
+
+  let(:now) { Time.now.tap { |x| Timecop.freeze x } }
+
+  let(:parse) { ->(x) { Tickle.parse x } }
+
+  let(:date_matcher) { ->(x, y) { x.to_i.must_equal y.to_i } }
+
+  describe "the basics" do
+
+    it "should match day" do
+      result = parse.call('day')
+      date_matcher.call(result[:starting], now)
+      date_matcher.call(result[:next],     now + 1.day)
+      result[:until].nil?.must_equal true
+      result[:expression].must_equal 'day'
+    end
+
   end
+
 end
 
 __END__
