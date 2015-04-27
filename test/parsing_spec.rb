@@ -1,8 +1,7 @@
 require_relative 'spec_helper'
 
-def now now = nil
-  Timecop.freeze(now) if nil
-  Time.now
+def set_now_to now
+  Timecop.freeze now
 end
 
 describe "parsing strings to get timeframes" do
@@ -14,23 +13,32 @@ describe "parsing strings to get timeframes" do
   describe "the basics" do
 
     [
-      ['day',         now, now + 1.day,  nil, 'day'],
-      ['every day',   now, now + 1.day,  nil, 'day'],
-      ['every week',  now, now + 1.week, nil, 'week'],
-    ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
+      Time.parse('2015-04-27 15:19:14 -0500'),
+      Time.parse('2015-01-01 15:19:14 -0500'),
+    ].each do |now|
 
-      describe "parsing" do
+      [
+        ['day',         now, now + 1.day,  nil, 'day'],
+        ['every day',   now, now + 1.day,  nil, 'day'],
+        ['every week',  now, now + 1.week, nil, 'week'],
+      ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
 
-        it example.input do
-          result = parse.call example.input
-          date_matcher.call(result[:starting], example.start)
-          date_matcher.call(result[:next],     example.next)
-          if example.until
-            result[:until].must_equal example.until
-          else
-            result[:until].nil?.must_equal true
+        describe "parsing from #{now}" do
+
+          before { set_now_to now }
+
+          it example.input do
+            result = parse.call example.input
+            date_matcher.call(result[:starting], example.start)
+            date_matcher.call(result[:next],     example.next)
+            if example.until
+              result[:until].must_equal example.until
+            else
+              result[:until].nil?.must_equal true
+            end
+            result[:expression].must_equal example.expression
           end
-          result[:expression].must_equal example.expression
+
         end
 
       end
