@@ -74,18 +74,18 @@ module Tickle
                      # process each original word for implied word
                      post_tokenize
 
-                     @tokens.each {|x| Tickle.dwrite("raw: #{x.inspect}")}
+                     @tokens.each { |x| Tickle.dwrite("raw: #{x.inspect}") }
 
                      # scan the tokens with each token scanner
                      @tokens = Repeater.scan(@tokens)
 
                      # remove all tokens without a type
-                     @tokens.reject! {|token| token.type.nil? }
+                     @tokens.reject! { |token| token.type.nil? }
 
                      # combine number and ordinals into single number
                      combine_multiple_numbers
 
-                     @tokens.each {|x| Tickle.dwrite("processed: #{x.inspect}")}
+                     @tokens.each { |x| Tickle.dwrite("processed: #{x.inspect}") }
 
                      # if we can't guess it maybe chronic can
                      (guess || chronic_parse(event))
