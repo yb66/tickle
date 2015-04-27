@@ -168,11 +168,11 @@ module Tickle
     def pre_filter(text)
       return nil unless text
 
-      text.gsub!(/every(\s)?/, '')
-      text.gsub!(/each(\s)?/, '')
+      text.gsub!(/every(\s)?/,          '')
+      text.gsub!(/each(\s)?/,           '')
       text.gsub!(/repeat(s|ing)?(\s)?/, '')
-      text.gsub!(/on the(\s)?/, '')
-      text.gsub!(/([^\w\d\s])+/, '')
+      text.gsub!(/on the(\s)?/,         '')
+      text.gsub!(/([^\w\d\s])+/,        '')
       text.downcase.strip
       text = normalize_us_holidays(text)
     end
