@@ -62,35 +62,34 @@ module Tickle
       raise(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur after the end date") if @until && @start.to_date > @until.to_date
 
       # no need to guess at expression if the start_date is in the future
-      best_guess = nil
-      if @start.to_date > options[:now].to_date
-        best_guess = @start
-      else
-        # put the text into a normal format to ease scanning using Chronic
-        event = pre_filter(event)
+      best_guess = if @start.to_date > options[:now].to_date
+                     @start
+                   else
+                     # put the text into a normal format to ease scanning using Chronic
+                     event = pre_filter(event)
 
-        # split into tokens
-        @tokens = base_tokenize(event)
+                     # split into tokens
+                     @tokens = base_tokenize(event)
 
-        # process each original word for implied word
-        post_tokenize
+                     # process each original word for implied word
+                     post_tokenize
 
-        @tokens.each {|x| Tickle.dwrite("raw: #{x.inspect}")}
+                     @tokens.each {|x| Tickle.dwrite("raw: #{x.inspect}")}
 
-        # scan the tokens with each token scanner
-        @tokens = Repeater.scan(@tokens)
+                     # scan the tokens with each token scanner
+                     @tokens = Repeater.scan(@tokens)
 
-        # remove all tokens without a type
-        @tokens.reject! {|token| token.type.nil? }
+                     # remove all tokens without a type
+                     @tokens.reject! {|token| token.type.nil? }
 
-        # combine number and ordinals into single number
-        combine_multiple_numbers
+                     # combine number and ordinals into single number
+                     combine_multiple_numbers
 
-        @tokens.each {|x| Tickle.dwrite("processed: #{x.inspect}")}
+                     @tokens.each {|x| Tickle.dwrite("processed: #{x.inspect}")}
 
-        # if we can't guess it maybe chronic can
-        best_guess = (guess || chronic_parse(event))
-      end
+                     # if we can't guess it maybe chronic can
+                     (guess || chronic_parse(event))
+                   end
 
       raise(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
 
