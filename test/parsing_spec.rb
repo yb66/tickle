@@ -14,13 +14,13 @@ describe "parsing strings to get timeframes" do
   describe "the basics" do
 
     [
-      ['day',       now + 1.day, nil, 'day'],
-      ['every day', now + 1.day, nil, 'day'],
-    ].map { |x| Struct.new(:input, :next, :until, :expression).new(*x) }.each do |example|
+      ['day',        now, now + 1.day,  nil, 'day'],
+      ['every day',  now, now + 1.day,  nil, 'day'],
+    ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
       describe "parsing" do
         it example.input do
           result = parse.call example.input
-          date_matcher.call(result[:starting], now)
+          date_matcher.call(result[:starting], example.start)
           date_matcher.call(result[:next],     example.next)
           if example.until
             result[:until].must_equal example.until
