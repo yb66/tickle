@@ -9,12 +9,12 @@ module Tickle #:nodoc:
       return nil if @tokens.empty?
 
       guess_unit_types
-      guess_weekday unless @next
-      guess_month_names unless @next
-      guess_number_and_unit unless @next
-      guess_ordinal unless @next
+      guess_weekday          unless @next
+      guess_month_names      unless @next
+      guess_number_and_unit  unless @next
+      guess_ordinal          unless @next
       guess_ordinal_and_unit unless @next
-      guess_special unless @next
+      guess_special          unless @next
 
       # check to see if next is less than now and, if so, set it to next year
       @next = Time.local(@next.year + 1, @next.month, @next.day, @next.hour, @next.min, @next.sec) if @next && @next.to_date < @start.to_date
@@ -24,10 +24,10 @@ module Tickle #:nodoc:
     end
 
     def guess_unit_types
-      @next = @start.bump(:day) if token_types.same?([:day])
-      @next = @start.bump(:week) if token_types.same?([:week])
+      @next = @start.bump(:day)   if token_types.same?([:day])
+      @next = @start.bump(:week)  if token_types.same?([:week])
       @next = @start.bump(:month) if token_types.same?([:month])
-      @next = @start.bump(:year) if token_types.same?([:year])
+      @next = @start.bump(:year)  if token_types.same?([:year])
     end
 
     def guess_weekday
