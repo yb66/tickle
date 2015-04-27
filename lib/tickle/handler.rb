@@ -1,4 +1,5 @@
 module Tickle #:nodoc:
+
   class << self #:nodoc:
 
     # The heavy lifting.  Goes through each token groupings to determine what natural language should either by
@@ -70,8 +71,8 @@ module Tickle #:nodoc:
     def guess_special
       guess_special_other
       guess_special_beginning unless @next
-      guess_special_middle unless @next
-      guess_special_end unless @next
+      guess_special_middle    unless @next
+      guess_special_end       unless @next
     end
 
     private
@@ -96,7 +97,7 @@ module Tickle #:nodoc:
     end
 
     def guess_special_middle
-      if token_types.same?([:special, :week]) && token_of_type(:special).start == :middle then @next = chronic_parse_with_start('Wednesday'); end
+      if token_types.same?([:special, :week])  && token_of_type(:special).start == :middle then @next = chronic_parse_with_start('Wednesday'); end
       if token_types.same?([:special, :month]) && token_of_type(:special).start == :middle then
         @next = (@start.day > 15 ? Date.civil(@start.year, @start.month + 1, 15) : Date.civil(@start.year, @start.month, 15))
       end
@@ -124,6 +125,6 @@ module Tickle #:nodoc:
       return arg_date
     end
 
-
   end
+
 end
