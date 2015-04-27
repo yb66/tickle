@@ -77,16 +77,16 @@ module Tickle #:nodoc:
     private
 
     def guess_special_other
-      @next = @start.bump(:day, 2) if token_types.same?([:special, :day]) && token_of_type(:special).start == :other
-      @next = @start.bump(:week, 2)  if token_types.same?([:special, :week]) && token_of_type(:special).start == :other
+      @next = @start.bump(:day, 2)  if token_types.same?([:special, :day])  && token_of_type(:special).start == :other
+      @next = @start.bump(:week, 2) if token_types.same?([:special, :week]) && token_of_type(:special).start == :other
       @next = chronic_parse_with_start('2 months from now') if token_types.same?([:special, :month]) && token_of_type(:special).start == :other
-      @next = chronic_parse_with_start('2 years from now') if token_types.same?([:special, :year]) && token_of_type(:special).start == :other
+      @next = chronic_parse_with_start('2 years from now')  if token_types.same?([:special, :year])  && token_of_type(:special).start == :other
     end
 
     def guess_special_beginning
-      if token_types.same?([:special, :week]) && token_of_type(:special).start == :beginning then @next = chronic_parse_with_start('Sunday'); end
+      if token_types.same?([:special, :week])  && token_of_type(:special).start == :beginning then @next = chronic_parse_with_start('Sunday'); end
       if token_types.same?([:special, :month]) && token_of_type(:special).start == :beginning then @next = Date.civil(@start.year, @start.month + 1, 1); end
-      if token_types.same?([:special, :year]) && token_of_type(:special).start == :beginning then @next = Date.civil(@start.year+1, 1, 1); end
+      if token_types.same?([:special, :year])  && token_of_type(:special).start == :beginning then @next = Date.civil(@start.year+1, 1, 1); end
     end
 
     def guess_special_end
