@@ -1,5 +1,10 @@
-require 'minitest/autorun'
-require 'minitest/spec'
+require_relative 'spec_helper'
+
+describe "this gem" do
+  it "should get some love" do
+    'A'.must_equal 'A'
+  end
+end
 
 __END__
 class TestParsing < Test::Unit::TestCase
