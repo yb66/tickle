@@ -10,12 +10,16 @@ describe "parsing strings to get timeframes" do
 
   describe "the basics" do
 
-    it "should match day" do
-      result = parse.call('day')
-      date_matcher.call(result[:starting], now)
-      date_matcher.call(result[:next],     now + 1.day)
-      result[:until].nil?.must_equal true
-      result[:expression].must_equal 'day'
+    ['day', 'every day'].each do |input|
+      describe "multiple examples" do
+        it "should match day" do
+          result = parse.call input
+          date_matcher.call(result[:starting], now)
+          date_matcher.call(result[:next],     now + 1.day)
+          result[:until].nil?.must_equal true
+          result[:expression].must_equal 'day'
+        end
+      end
     end
 
   end
