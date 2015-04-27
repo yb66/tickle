@@ -15,6 +15,7 @@ describe "parsing strings to get timeframes" do
     [
       Time.parse('2015-04-27 15:19:14 -0500'),
       Time.parse('2015-01-01 15:19:14 -0500'),
+      Time.parse('2017-12-25'),
     ].each do |now|
 
       [
