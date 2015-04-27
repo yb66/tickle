@@ -173,7 +173,9 @@ module Tickle
       text.gsub!(/repeat(s|ing)?(\s)?/, '')
       text.gsub!(/on the(\s)?/,         '')
       text.gsub!(/([^\w\d\s])+/,        '')
+      # this does nothing?
       text.downcase.strip
+      # ^^^^^^^^^^^^^^^^^^
       text = normalize_us_holidays(text)
     end
 
