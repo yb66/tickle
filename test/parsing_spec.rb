@@ -39,6 +39,11 @@ describe "parsing strings to get timeframes" do
         ['every 9 weeks',  now, now + 9.weeks,  nil,  '9 weeks'],
         ['every 9 months', now, now + 9.months, nil,  '9 months'],
         ['every 9 years',  now, now + 9.years,  nil,  '9 years'],
+        ###
+        ['every other day',   now, now + 2.days,   nil,  'other day'],
+        ['every other week',  now, now + 2.weeks,  nil,  'other week'],
+        ['every other month', now, now + 2.months, nil,  'other month'],
+        ['every other year',  now, now + 2.years,  nil,  'other year'],
       ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
 
         describe "parsing from #{now}" do
