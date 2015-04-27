@@ -5,12 +5,12 @@ class Tickle::Repeater < Chronic::Tag #:nodoc:
     tokens.each do |token|
       token = self.scan_for_numbers(token)
       token = self.scan_for_ordinal_names(token) unless token.type
-      token = self.scan_for_ordinals(token) unless token.type
-      token = self.scan_for_month_names(token) unless token.type
-      token = self.scan_for_day_names(token) unless token.type
-      token = self.scan_for_year_name(token) unless token.type
-      token = self.scan_for_special_text(token) unless token.type
-      token = self.scan_for_units(token) unless token.type
+      token = self.scan_for_ordinals(token)      unless token.type
+      token = self.scan_for_month_names(token)   unless token.type
+      token = self.scan_for_day_names(token)     unless token.type
+      token = self.scan_for_year_name(token)     unless token.type
+      token = self.scan_for_special_text(token)  unless token.type
+      token = self.scan_for_units(token)         unless token.type
     end
     tokens
   end
@@ -22,28 +22,29 @@ class Tickle::Repeater < Chronic::Tag #:nodoc:
   end
 
   def self.scan_for_ordinal_names(token)
-    scanner = {/first/ => '1st',
-      /second/ => '2nd',
-      /third/ => '3rd',
-      /fourth/ => '4th',
-      /fifth/ => '5th',
-      /sixth/ => '6th',
-      /seventh/ => '7th',
-      /eighth/ => '8th',
-      /ninth/ => '9th',
-      /tenth/ => '10th',
-      /eleventh/ => '11th',
-      /twelfth/ => '12th',
-      /thirteenth/ => '13th',
-      /fourteenth/ => '14th',
-      /fifteenth/ => '15th',
-      /sixteenth/ => '16th',
-      /seventeenth/ => '17th',
-      /eighteenth/ => '18th',
-      /nineteenth/ => '19th',
-      /twentieth/ => '20th',
-      /thirtieth/ => '30th',
-    }
+    scanner = { 
+                /first/       => '1st',
+                /second/      => '2nd',
+                /third/       => '3rd',
+                /fourth/      => '4th',
+                /fifth/       => '5th',
+                /sixth/       => '6th',
+                /seventh/     => '7th',
+                /eighth/      => '8th',
+                /ninth/       => '9th',
+                /tenth/       => '10th',
+                /eleventh/    => '11th',
+                /twelfth/     => '12th',
+                /thirteenth/  => '13th',
+                /fourteenth/  => '14th',
+                /fifteenth/   => '15th',
+                /sixteenth/   => '16th',
+                /seventeenth/ => '17th',
+                /eighteenth/  => '18th',
+                /nineteenth/  => '19th',
+                /twentieth/   => '20th',
+                /thirtieth/   => '30th',
+              }
     scanner.keys.each do |scanner_item|
       if scanner_item =~ token.original
         token.word = scanner[scanner_item]
