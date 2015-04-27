@@ -113,6 +113,46 @@ describe "parsing strings to get timeframes" do
 
         end
 
+        describe "at the end of the week, midday (sunday)" do
+
+          [
+            Time.parse('2015-04-25 00:00:00 -0500'),
+          ].each do |now|
+
+            [
+              ['every Sunday',    now, now + 1.days + 12.hours,  nil,  'sunday'],
+              ['every Monday',    now, now + 2.day  + 12.hours,  nil,  'monday'],
+              ['every Tuesday',   now, now + 3.days + 12.hours,  nil,  'tuesday'],
+              ['every Wednesday', now, now + 4.days + 12.hours,  nil,  'wednesday'],
+              ['every Thursday',  now, now + 5.days + 12.hours,  nil,  'thursday'],
+              ['every Friday',    now, now + 6.days + 12.hours,  nil,  'friday'],
+              ['every Saturday',  now, now + 7.days + 12.hours,  nil,  'saturday'],
+            ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
+
+              describe example.input do
+
+                before { set_now_to now }
+
+                it 'should match the expected day' do
+                  result = parse.call example.input
+                  date_matcher.call(result[:starting], example.start)
+                  date_matcher.call(result[:next],  example.next)
+                  if example.until
+                    result[:until].must_equal example.until
+                  else
+                    result[:until].nil?.must_equal true
+                  end
+                  result[:expression].must_equal example.expression
+                end
+
+              end
+
+            end
+
+          end
+
+        end
+
       end
 
     #assert_date_match(@date.bump(:wday, 'Mon'), 'every Monday')
