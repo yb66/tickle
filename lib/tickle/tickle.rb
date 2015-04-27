@@ -94,11 +94,11 @@ module Tickle
       raise(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
 
       if !best_guess
-        return nil
+        nil
       elsif options[:next_only] != true
-        return {:next => best_guess.to_time, :expression => event.strip, :starting => @start, :until => @until}
+        {:next => best_guess.to_time, :expression => event.strip, :starting => @start, :until => @until}
       else
-        return best_guess
+        best_guess
       end
     end
 
