@@ -1,7 +1,7 @@
-require_relative './helper.rb'
-require 'time'
-require 'test/unit'
+require 'minitest/autorun'
+require 'minitest/spec'
 
+__END__
 class TestParsing < Test::Unit::TestCase
 
   def setup
