@@ -24,5 +24,6 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "bundler", "~> 1.2"
   s.add_development_dependency "rake"
+  s.add_development_dependency 'timecop'
 end
 
