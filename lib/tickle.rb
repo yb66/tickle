@@ -12,6 +12,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))     # For use/testing when no gem is 
 require 'date'
 require 'time'
 require 'chronic'
+require 'active_support/all' 
 
 require 'tickle/tickle'
 require 'tickle/handler'
@@ -78,16 +79,16 @@ class Time #:nodoc:
     when :hour then
       Time.local(self.year, self.month, self.day, self.hour + amount, self.min, self.sec)
     when :day then
-      Time.local(self.year, self.month, self.day + amount, self.hour, self.min, self.sec)
+      Time.local(self.year, self.month, self.day, self.hour, self.min, self.sec) + amount.days
     when :wday then
       amount = Time::RFC2822_DAY_NAME.index(amount) if amount.is_a?(String)
       raise Exception, "specified day of week invalid.  Use #{Time::RFC2822_DAY_NAME}" unless amount
       diff = (amount > self.wday) ? (amount - self.wday) : (7 - (self.wday - amount))
       Time.local(self.year, self.month, self.day + diff, self.hour, self.min, self.sec)
     when :week then
-      Time.local(self.year, self.month, self.day + (amount * 7), self.hour, self.min, self.sec)
+      Time.local(self.year, self.month, self.day, self.hour, self.min, self.sec) + amount.weeks
     when :month then
-      Time.local(self.year, self.month + amount, self.day, self.hour, self.min, self.sec)
+      Time.local(self.year, self.month, self.day, self.hour, self.min, self.sec) + amount.months
     when :year then
       Time.local(self.year + amount, self.month, self.day, self.hour, self.min, self.sec)
     else

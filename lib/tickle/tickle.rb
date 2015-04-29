@@ -62,44 +62,43 @@ module Tickle
       raise(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur after the end date") if @until && @start.to_date > @until.to_date
 
       # no need to guess at expression if the start_date is in the future
-      best_guess = nil
-      if @start.to_date > options[:now].to_date
-        best_guess = @start
-      else
-        # put the text into a normal format to ease scanning using Chronic
-        event = pre_filter(event)
+      best_guess = if @start.to_date > options[:now].to_date
+                     @start
+                   else
+                     # put the text into a normal format to ease scanning using Chronic
+                     event = pre_filter(event)
 
-        # split into tokens
-        @tokens = base_tokenize(event)
+                     # split into tokens
+                     @tokens = base_tokenize(event)
 
-        # process each original word for implied word
-        post_tokenize
+                     # process each original word for implied word
+                     post_tokenize
 
-        @tokens.each {|x| Tickle.dwrite("raw: #{x.inspect}")}
+                     @tokens.each { |x| Tickle.dwrite("raw: #{x.inspect}") }
 
-        # scan the tokens with each token scanner
-        @tokens = Repeater.scan(@tokens)
+                     # scan the tokens with each token scanner
+                     @tokens = Repeater.scan(@tokens)
 
-        # remove all tokens without a type
-        @tokens.reject! {|token| token.type.nil? }
+                     # remove all tokens without a type
+                     @tokens.reject! { |token| token.type.nil? }
 
-        # combine number and ordinals into single number
-        combine_multiple_numbers
+                     # combine number and ordinals into single number
+                     combine_multiple_numbers
 
-        @tokens.each {|x| Tickle.dwrite("processed: #{x.inspect}")}
+                     @tokens.each { |x| Tickle.dwrite("processed: #{x.inspect}") }
 
-        # if we can't guess it maybe chronic can
-        best_guess = (guess || chronic_parse(event))
-      end
+                     # if we can't guess it maybe chronic can
+                     (guess || chronic_parse(event))
+                   end
 
       raise(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && best_guess.to_date > @until.to_date
 
       if !best_guess
-        return nil
+        nil
       elsif options[:next_only] != true
-        return {:next => best_guess.to_time, :expression => event.strip, :starting => @start, :until => @until}
+        {:next => best_guess.to_time, :expression => event.strip, :starting => @start, :until => @until}
       else
-        return best_guess
+        best_guess
       end
     end
 
@@ -107,21 +106,21 @@ module Tickle
     def scan_expression(text, options)
       starting = ending = nil
 
-      start_every_regex = /^(start(?:s|ing)?)\s(.*)(\s(?:every|each|\bon\b|repeat)(?:s|ing)?)(.*)/i
-      every_start_regex = /^(every|each|\bon\b|repeat(?:the)?)\s(.*)(\s(?:start)(?:s|ing)?)(.*)/i
+      start_every_regex  = /^(start(?:s|ing)?)\s(.*)(\s(?:every|each|\bon\b|repeat)(?:s|ing)?)(.*)/i
+      every_start_regex  = /^(every|each|\bon\b|repeat(?:the)?)\s(.*)(\s(?:start)(?:s|ing)?)(.*)/i
       start_ending_regex = /^(start(?:s|ing)?)\s(.*)(\s(?:\bend|until)(?:s|ing)?)(.*)/i
       if text =~ start_every_regex
         starting = text.match(start_every_regex)[2].strip
-        text = text.match(start_every_regex)[4].strip
+        text     = text.match(start_every_regex)[4].strip
         event, ending = process_for_ending(text)
       elsif text =~ every_start_regex
         event = text.match(every_start_regex)[2].strip
-        text = text.match(every_start_regex)[4].strip
+        text  = text.match(every_start_regex)[4].strip
         starting, ending = process_for_ending(text)
       elsif text =~ start_ending_regex
         starting = text.match(start_ending_regex)[2].strip
-        ending = text.match(start_ending_regex)[4].strip
-        event = 'day'
+        ending   = text.match(start_ending_regex)[4].strip
+        event    = 'day'
       else
         event, ending = process_for_ending(text)
       end
@@ -169,12 +168,14 @@ module Tickle
     def pre_filter(text)
       return nil unless text
 
-      text.gsub!(/every(\s)?/, '')
-      text.gsub!(/each(\s)?/, '')
+      text.gsub!(/every(\s)?/,          '')
+      text.gsub!(/each(\s)?/,           '')
       text.gsub!(/repeat(s|ing)?(\s)?/, '')
-      text.gsub!(/on the(\s)?/, '')
-      text.gsub!(/([^\w\d\s])+/, '')
+      text.gsub!(/on the(\s)?/,         '')
+      text.gsub!(/([^\w\d\s])+/,        '')
+      # this does nothing?
       text.downcase.strip
+      # ^^^^^^^^^^^^^^^^^^
       text = normalize_us_holidays(text)
     end
 
@@ -310,11 +311,11 @@ module Tickle
 
   # This exception is raised if an invalid argument is provided to
   # any of Tickle's methods
-  class InvalidArgumentException < Exception
+  class InvalidArgumentException < StandardError
   end
 
   # This exception is raised if there is an issue with the parsing
   # output from the date expression provided
-  class InvalidDateExpression < Exception
+  class InvalidDateExpression < StandardError
   end
 end

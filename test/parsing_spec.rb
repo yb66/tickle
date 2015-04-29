@@ -1,7 +1,178 @@
-require_relative './helper.rb'
-require 'time'
-require 'test/unit'
+require_relative 'spec_helper'
 
+def set_now_to now
+  Timecop.freeze now
+end
+
+describe "parsing strings to get timeframes" do
+
+  let(:parse) { ->(x) { Tickle.parse x } }
+
+  let(:date_matcher) { ->(x, y) { x.to_i.must_equal y.to_i } }
+
+  describe "the basics" do
+
+    [
+      Time.parse('2015-04-27 15:19:14 -0500'),
+      Time.parse('2015-01-01 15:19:14 -0500'),
+      Time.parse('2017-12-25'),
+    ].each do |now|
+
+      [
+        ['day',          now, now + 1.day,   nil, 'day'],
+        ['every day',    now, now + 1.day,   nil, 'day'],
+        ['every week',   now, now + 1.week,  nil, 'week'],
+        ['every month',  now, now + 1.month, nil, 'month'],
+        ['every year',   now, now + 1.year,  nil, 'year'],
+        ###
+        ['daily',        now, now + 1.day,   nil, 'daily'],
+        ['weekly',       now, now + 1.week,  nil, 'weekly'],
+        ['monthly',      now, now + 1.month, nil, 'monthly'],
+        ['yearly',       now, now + 1.year,  nil, 'yearly'],
+        ###
+        ['every 3 days',   now, now + 3.days,   nil,  '3 days'],
+        ['every 3 weeks',  now, now + 3.weeks,  nil,  '3 weeks'],
+        ['every 3 months', now, now + 3.months, nil,  '3 months'],
+        ['every 3 years',  now, now + 3.years,  nil,  '3 years'],
+        ###
+        ['every 9 days',   now, now + 9.days,   nil,  '9 days'],
+        ['every 9 weeks',  now, now + 9.weeks,  nil,  '9 weeks'],
+        ['every 9 months', now, now + 9.months, nil,  '9 months'],
+        ['every 9 years',  now, now + 9.years,  nil,  '9 years'],
+        ###
+        ['every other day',   now, now + 2.days,   nil,  'other day'],
+        ['every other week',  now, now + 2.weeks,  nil,  'other week'],
+        ['every other month', now, now + 2.months, nil,  'other month'],
+        ['every other year',  now, now + 2.years,  nil,  'other year'],
+      ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
+
+        describe "parsing from #{now}" do
+
+          before { set_now_to now }
+
+          it example.input do
+            result = parse.call example.input
+            date_matcher.call(result[:starting], example.start)
+            date_matcher.call(result[:next],     example.next)
+            if example.until
+              result[:until].must_equal example.until
+            else
+              result[:until].nil?.must_equal true
+            end
+            result[:expression].must_equal example.expression
+          end
+
+        end
+
+      end
+
+    end
+
+    
+    describe "specific dates of the week"  do
+
+      describe "every weekday" do
+
+        describe "at the beginning of the week, midday (sunday)" do
+
+          [
+            Time.parse('2015-04-26 00:00:00 -0500'),
+          ].each do |now|
+
+            [
+              ['every Monday',    now, now + 1.day  + 12.hours,  nil,  'monday'],
+              ['every Tuesday',   now, now + 2.days + 12.hours,  nil,  'tuesday'],
+              ['every Wednesday', now, now + 3.days + 12.hours,  nil,  'wednesday'],
+              ['every Thursday',  now, now + 4.days + 12.hours,  nil,  'thursday'],
+              ['every Friday',    now, now + 5.days + 12.hours,  nil,  'friday'],
+              ['every Saturday',  now, now + 6.days + 12.hours,  nil,  'saturday'],
+              ['every Sunday',    now, now + 7.days + 12.hours,  nil,  'sunday'],
+            ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
+
+              describe example.input do
+
+                before { set_now_to now }
+
+                it 'should match the expected day' do
+                  result = parse.call example.input
+                  date_matcher.call(result[:starting], example.start)
+                  date_matcher.call(result[:next],  example.next)
+                  if example.until
+                    result[:until].must_equal example.until
+                  else
+                    result[:until].nil?.must_equal true
+                  end
+                  result[:expression].must_equal example.expression
+                end
+
+              end
+
+            end
+
+          end
+
+        end
+
+        describe "at the end of the week, midday (sunday)" do
+
+          [
+            Time.parse('2015-04-25 00:00:00 -0500'),
+          ].each do |now|
+
+            [
+              ['every Sunday',    now, now + 1.days + 12.hours,  nil,  'sunday'],
+              ['every Monday',    now, now + 2.day  + 12.hours,  nil,  'monday'],
+              ['every Tuesday',   now, now + 3.days + 12.hours,  nil,  'tuesday'],
+              ['every Wednesday', now, now + 4.days + 12.hours,  nil,  'wednesday'],
+              ['every Thursday',  now, now + 5.days + 12.hours,  nil,  'thursday'],
+              ['every Friday',    now, now + 6.days + 12.hours,  nil,  'friday'],
+              ['every Saturday',  now, now + 7.days + 12.hours,  nil,  'saturday'],
+            ].map { |x| Struct.new(:input, :start, :next, :until, :expression).new(*x) }.each do |example|
+
+              describe example.input do
+
+                before { set_now_to now }
+
+                it 'should match the expected day' do
+                  result = parse.call example.input
+                  date_matcher.call(result[:starting], example.start)
+                  date_matcher.call(result[:next],  example.next)
+                  if example.until
+                    result[:until].must_equal example.until
+                  else
+                    result[:until].nil?.must_equal true
+                  end
+                  result[:expression].must_equal example.expression
+                end
+
+              end
+
+            end
+
+          end
+
+        end
+
+      end
+
+    #assert_date_match(@date.bump(:wday, 'Mon'), 'every Monday')
+    #assert_date_match(@date.bump(:wday, 'Wed'), 'every Wednesday')
+    #assert_date_match(@date.bump(:wday, 'Fri'), 'every Friday')
+#
+    #assert_date_match(Date.new(2021, 2, 1), 'every February', {:start => start, :now => start})
+    #assert_date_match(Date.new(2020, 5, 1), 'every May', {:start => start, :now => start})
+    #assert_date_match(Date.new(2020, 6, 1), 'every june', {:start => start, :now => start})
+#
+    #assert_date_match(@date.bump(:wday, 'Sun'), 'beginning of the week')
+    #assert_date_match(@date.bump(:wday, 'Wed'), 'middle of the week')
+    #assert_date_match(@date.bump(:wday, 'Sat'), 'end of the week')
+    end
+
+  end
+
+end
+
+__END__
 class TestParsing < Test::Unit::TestCase
 
   def setup
