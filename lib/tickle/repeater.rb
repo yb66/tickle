@@ -141,5 +141,4 @@ class Tickle::Repeater < Chronic::Tag #:nodoc:
     token
   end
 
-
 end
