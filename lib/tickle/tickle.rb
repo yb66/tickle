@@ -311,11 +311,11 @@ module Tickle
 
   # This exception is raised if an invalid argument is provided to
   # any of Tickle's methods
-  class InvalidArgumentException < Exception
+  class InvalidArgumentException < StandardError
   end
 
   # This exception is raised if there is an issue with the parsing
   # output from the date expression provided
-  class InvalidDateExpression < Exception
+  class InvalidDateExpression < StandardError
   end
 end
