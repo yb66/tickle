@@ -12,6 +12,14 @@ describe "Parsing" do
 
   describe "parse", :integration => true do
 
+    context "Asked with an object that responds to :to_time" do
+      describe "Returning it immediately" do
+        let(:expected) { Date.parse("7th October 2015") }
+        subject{ Tickle.parse(expected) }
+        it { should == expected }
+      end
+    end
+
     context "Simple examples", :frozen => true do
 
       context "second" do
