@@ -7,6 +7,7 @@ group :development do
   gem "maruku"
   gem "yard"
   gem "pry"
+  gem "activesupport"
 end
 
 group :test do
