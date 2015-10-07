@@ -14,6 +14,24 @@ describe "Parsing" do
 
     context "Simple examples", :frozen => true do
 
+      context "second" do
+        subject{ Tickle.parse('second') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 20:57:37 +0000"), :expression=>"second", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
+      context "minute" do
+        subject{ Tickle.parse('minute') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 20:58:36 +0000"), :expression=>"minute", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
+      context "hour" do
+        subject{ Tickle.parse('hour') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 21:57:36 +0000"), :expression=>"hour", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
       context "day" do
         subject{ Tickle.parse('day') }
         let(:expected) { {:next=>Time.parse("2010-05-10 20:57:36 +0000"), :expression=>"day", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
@@ -36,6 +54,12 @@ describe "Parsing" do
         subject{ Tickle.parse('year') }
         let(:expected) { {:next=>Time.parse("2011-05-09 20:57:36 +0000"), :expression=>"year", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
         it { should == expected }
+      end
+
+      context "hourly" do
+        subject{ Tickle.parse('hourly') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 21:57:36 +0000"), :expression=>"hourly", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
       end
 
       context "daily" do
@@ -62,6 +86,24 @@ describe "Parsing" do
         it { should == expected }
       end
 
+      context "3 seconds" do
+        subject{ Tickle.parse('3 seconds') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 20:57:39 +0000"), :expression=>"3 seconds", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
+      context "3 minutes" do
+        subject{ Tickle.parse('3 minutes') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 21:00:36 +0000"), :expression=>"3 minutes", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
+      context "3 hours" do
+        subject{ Tickle.parse('3 hours') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 23:57:36 +0000"), :expression=>"3 hours", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
       context "3 days" do
         subject{ Tickle.parse('3 days') }
         let(:expected) { {:next=>Time.parse("2010-05-12 20:57:36 +0000"), :expression=>"3 days", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
@@ -84,6 +126,24 @@ describe "Parsing" do
         subject{ Tickle.parse('3 years') }
         let(:expected) { {:next=>Time.parse("2013-05-09 20:57:36 +0000"), :expression=>"3 years", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
         it { should == expected }
+      end
+
+      context "other second" do
+        subject{ Tickle.parse('other second') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 20:57:38 +0000"), :expression=>"other second", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
+      context "other minute" do
+        subject{ Tickle.parse('other minute') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 20:59:36 +0000"), :expression=>"other minute", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
+      context "other hour" do
+        subject{ Tickle.parse('other hour') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 22:57:36 +0000"), :expression=>"other hour", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
       end
 
       context "other day" do
@@ -110,6 +170,18 @@ describe "Parsing" do
         it { should == expected }
       end
 
+      context "noon" do
+        subject{ Tickle.parse('noon') }
+        let(:expected) { {:next=>Time.parse("2010-05-10 12:00:00 +0000"), :expression=>"12:00", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
+      context "midnight" do
+        subject{ Tickle.parse('noon') }
+        let(:expected) { {:next=>Time.parse("2010-05-10 00:00:00 +0000"), :expression=>"00:00", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
       context "Monday" do
         subject{ Tickle.parse('Monday') }
         let(:expected) { {:next=>Time.parse("2010-05-10 12:00:00 +0000"), :expression=>"monday", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
@@ -126,6 +198,19 @@ describe "Parsing" do
         subject{ Tickle.parse('Friday') }
         let(:expected) { {:next=>Time.parse("2010-05-14 12:00:00 +0000"), :expression=>"friday", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
         it { should == expected }
+      end
+
+      context "With time specified", :frozen => true do
+        context "Monday at 3am" do
+          subject{ Tickle.parse('Monday at 3am') }
+          let(:expected) { {:next=>Time.parse("2010-05-10 15:00:00 +0000"), :expression=>"monday 15:00", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+          xit { should == expected }
+        end
+        context "daily 16:23" do
+          subject{ Tickle.parse('daily') }
+          let(:expected) { {:next=>Time.parse("2010-05-10 16:23:00 +0000"), :expression=>"daily 16:23", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+          xit { should == expected }
+        end
       end
 
       context "Given that now is in the future, 2020-04-01 00:00:00 +0000" do
