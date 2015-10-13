@@ -6,7 +6,7 @@ group :development do
   gem "wirble"
   gem "maruku"
   gem "yard"
-  gem "pry"
+  gem "pry-byebug"
   gem "activesupport"
 end
 
