@@ -29,7 +29,7 @@ module Tickle
 
 
     def self.guess_unit_types( tokens, start)
-      [:day,:week,:month,:year].find {|unit|
+      [:sec,:day,:week,:month,:year].each {|unit|
         if Token.types(tokens).same?([unit])
           throw :guessed, start.bump(unit)
         end
@@ -60,7 +60,7 @@ module Tickle
 
     def self.guess_number_and_unit( tokens, start)
       _next = 
-        [:day,:week,:month,:year].each {|unit|
+        [:sec,:day,:week,:month,:year].each {|unit|
           if Token.types(tokens).same?([:number, unit])
             throw :guessed, start.bump( unit, Token.token_of_type(:number,tokens).interval )
           end

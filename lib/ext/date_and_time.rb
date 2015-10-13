@@ -24,6 +24,8 @@ class Date
       Date.civil(self.year, self.month+amount, self.day)
     when :year then
       Date.civil(self.year + amount, self.month, self.day)
+    when :sec then
+      Date.civil(self.year, self.month, self.day, self.hour, self.minute, self.sec + amount)
     else
       raise Exception, "type \"#{attr}\" not supported."
     end

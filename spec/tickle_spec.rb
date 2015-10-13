@@ -22,10 +22,18 @@ describe "Parsing" do
 
     context "Simple examples", :frozen => true do
 
-      context "second" do
-        subject{ Tickle.parse('second') }
-        let(:expected) { {:next=>Time.parse("2010-05-09 20:57:37 +0000"), :expression=>"second", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
-        xit { should == expected }
+      # Can't use second as it clashes with date ordinal names
+      context "seconds" do
+        subject{ Tickle.parse('seconds') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 20:57:37 +0000"), :expression=>"seconds", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        it { should == expected }
+      end
+
+      # Other variant for seconds
+      context "sec" do
+        subject{ Tickle.parse('sec') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 20:57:37 +0000"), :expression=>"sec", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        it { should == expected }
       end
 
       context "minute" do
@@ -97,7 +105,13 @@ describe "Parsing" do
       context "3 seconds" do
         subject{ Tickle.parse('3 seconds') }
         let(:expected) { {:next=>Time.parse("2010-05-09 20:57:39 +0000"), :expression=>"3 seconds", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
-        xit { should == expected }
+        it { should == expected }
+      end
+
+      context "3 sec" do
+        subject{ Tickle.parse('3 sec') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 20:57:39 +0000"), :expression=>"3 sec", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        it { should == expected }
       end
 
       context "3 minutes" do
@@ -136,7 +150,13 @@ describe "Parsing" do
         it { should == expected }
       end
 
-      context "other second" do
+      context "other seconds" do
+        subject{ Tickle.parse('other second') }
+        let(:expected) { {:next=>Time.parse("2010-05-09 20:57:38 +0000"), :expression=>"other second", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        xit { should == expected }
+      end
+
+      context "other sec" do
         subject{ Tickle.parse('other second') }
         let(:expected) { {:next=>Time.parse("2010-05-09 20:57:38 +0000"), :expression=>"other second", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
         xit { should == expected }
