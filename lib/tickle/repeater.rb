@@ -65,7 +65,7 @@ module Tickle
 
     SCAN_FOR_ORDINAL_NAMES = {
       /first/       => Ordinal.new( '1st' ),
-      /second/      => Ordinal.new( '2nd' ),
+      /second\b/    => Ordinal.new( '2nd' ),
       /third/       => Ordinal.new( '3rd' ),
       /fourth/      => Ordinal.new( '4th' ),
       /fifth/       => Ordinal.new( '5th' ),
@@ -232,6 +232,11 @@ module Tickle
                                 },
         /^daily$/           =>  {
                                   :type     => :day,
+                                  :interval => 1,
+                                  :start    => :today
+                                },
+        /^sec(?:onds)?$/    =>  {
+                                  :type     => :sec,
                                   :interval => 1,
                                   :start    => :today
                                 },
