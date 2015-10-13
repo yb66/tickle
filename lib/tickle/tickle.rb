@@ -53,7 +53,6 @@ module Tickle
       fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur in the past for a future event") if @start && @start.to_date < Date.today
       fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur after the end date") if @until && @start.to_date > @until.to_date
 
-
       # no need to guess at expression if the start_date is in the future
       best_guess = nil
       if @start.to_date > tickled.now.to_date
