@@ -16,7 +16,7 @@ bin/
 vendor/
 vendor.noindex/
 Gemfile.lock
-spec/
 .yardoc/
 .bundle/
 .rspec
+*.gem

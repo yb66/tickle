@@ -20,13 +20,8 @@ Gem::Specification.new do |s|
   
   s.require_paths = ["lib"]
 
-  s.add_dependency "chronic", "~> 0.2.3"
-  s.add_development_dependency "shoulda", "~> 2.10.3"
-  s.add_development_dependency "simplecov"
-
-  s.add_development_dependency "bundler", "~> 1.2"
-  s.add_development_dependency "rake"
-  s.add_development_dependency "yard"
-  s.add_development_dependency "maruku"
+  s.add_dependency "numerizer", "~> 0.2.0"
+  s.add_dependency "chronic",   "~> 0.10.2"
+  s.add_dependency "texttube",  "~> 6.0.0"
 end
 
