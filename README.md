@@ -11,7 +11,7 @@ Take a look at the `develop` branch where all this stuff will be happening.
 
 Tickle is a natural language parser for recurring events.
  
-Tickle is designed to be a complement to [Chronic](https://rubygems.org/gems/chronic) and can interpret things such as "every 2 days, every Sunday, Sundays, Weekly, etc."
+Tickle is designed to be a complement to [Chronic](https://rubygems.org/gems/chronic) and can interpret things such as "every 2 days", "every Sunday", “Sundays", “Weekly", etc.
 
 Tickle has one main method, `Tickle.parse`, which returns the next time the event should occur, at which point you simply call `Tickle.parse` again.   
 
