@@ -38,7 +38,7 @@ module Tickle
     # TODO Consider converting to a Tickled
     return asked if asked.respond_to? :day
 
-    tickled = Tickled.new asked, options
+    tickled = Tickled.new asked.dup, options
     _parse tickled
   end
 
