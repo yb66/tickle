@@ -1,14 +1,21 @@
 # CH CH CH CH CHANGES! #
 
+## Saturday the 7th of November 2015, 2.0.0.rc1 ##
 
-## Monday the 11th of November, v1.0.2 ##
+- Rewrite of the internals.
+- API should be pretty much the same from the outside, but enough things on the inside change to warrant the major version bump.
+- Chronic updated to 0.10.2.
+
+----
+
+## Monday the 11th of November 2013, v1.0.2 ##
 
 * Shoulda and simplecov aren't runtime dependencies, fixed that in the gemfile.
 * Got the version number right this time ;-)
 
 ----
 
-## Monday the 11th of November, v1.0.1 ##
+## Monday the 11th of November 2013, v1.0.1 ##
 
 * Moved library to new maintainer [https://github.com/yb66/tickle](@yb66)
 * Moved library to [http://semver.org/](semver).
