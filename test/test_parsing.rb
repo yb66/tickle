@@ -165,30 +165,30 @@ class TestParsing < Test::Unit::TestCase
 
   def test_argument_validation
     assert_raise(Tickle::InvalidArgumentException) do
-      time = Tickle.parse("may 27", :today => 'something odd')
+      Tickle.parse("may 27", :today => 'something odd')
     end
 
     assert_raise(Tickle::InvalidArgumentException) do
-      time = Tickle.parse("may 27", :foo => :bar)
+      Tickle.parse("may 27", :foo => :bar)
     end
 
     assert_raise(Tickle::InvalidArgumentException) do
-      time = Tickle.parse(nil)
+      Tickle.parse(nil)
     end
 
     assert_raise(Tickle::InvalidDateExpression) do
       past_date = Date.civil(Date.today.year, Date.today.month, Date.today.day - 1)
-      time = Tickle.parse("every other day", {:start => past_date})
+      Tickle.parse("every other day", {:start => past_date})
     end
 
     assert_raise(Tickle::InvalidDateExpression) do
-      start_date = Date.civil(Date.today.year, Date.today.month, Date.today.day + 10)
-      end_date = Date.civil(Date.today.year, Date.today.month, Date.today.day + 5)
-      time = Tickle.parse("every other day", :start => start_date, :until => end_date)
+      start_date = Date.civil(Date.today.year, Date.today.month).next_day(10)
+      end_date = Date.civil(Date.today.year, Date.today.month).next_day(5)
+      Tickle.parse("every other day", :start => start_date, :until => end_date)
     end
 
     assert_raise(Tickle::InvalidDateExpression) do
-      end_date = Date.civil(Date.today.year, Date.today.month+2, Date.today.day)
+      end_date = Date.civil(Date.today.year, Date.today.month, Date.today.day).next_month(2)
       parse_now('every 3 months', {:until => end_date})
     end
   end
