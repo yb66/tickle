@@ -1,14 +1,21 @@
 # CH CH CH CH CHANGES! #
 
+## Wednesday the 22nd of February 2017, v1.1.0 ##
 
-## Monday the 11th of November, v1.0.2 ##
+* Numerizer duplication removed. Thanks to https://github.com/bjonord.
+* Some very minor changes to the project, no other code changes.
+
+----
+
+
+## Monday the 11th of November 2015, v1.0.2 ##
 
 * Shoulda and simplecov aren't runtime dependencies, fixed that in the gemfile.
 * Got the version number right this time ;-)
 
 ----
 
-## Monday the 11th of November, v1.0.1 ##
+## Monday the 11th of November 2015, v1.0.1 ##
 
 * Moved library to new maintainer [https://github.com/yb66/tickle](@yb66)
 * Moved library to [http://semver.org/](semver).
