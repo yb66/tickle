@@ -18,7 +18,6 @@ require 'tickle/handler'
 require 'tickle/repeater'
 
 module Tickle #:nodoc:
-  VERSION = "0.1.7"
 
   def self.debug=(val); @debug = val; end
 
