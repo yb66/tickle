@@ -26,13 +26,6 @@ require_relative "ext/array.rb"
 require_relative "ext/date_and_time.rb"
 require_relative "ext/string.rb"
 
-# these are required not because they're used by the library
-# but because they clobber so much that testing
-# without them will miss possible problems
-require 'active_support/core_ext/string/conversions'
-require 'active_support/core_ext/date/calculations'
-require 'active_support/core_ext/date_time/calculations'
-require 'active_support/core_ext/time/calculations'
 
 # Tickle is a natural language parser for recurring events.
 module Tickle
