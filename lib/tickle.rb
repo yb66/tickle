@@ -9,6 +9,13 @@
 
 $LOAD_PATH.unshift(File.dirname(__FILE__))     # For use/testing when no gem is installed
 
+if ENV["DEBUG"]
+  warn "DEBUG MODE ON" 
+  require 'pry-byebug' 
+  require 'pry-state'
+  binding.pry
+end
+
 require 'date'
 require 'time'
 require 'chronic'
