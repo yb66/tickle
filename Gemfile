@@ -7,6 +7,7 @@ group :development do
   gem "maruku"
   gem "yard"
   gem "pry-byebug"
+  gem "pry-state"
   gem "activesupport"
 end
 
