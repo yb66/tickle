@@ -5,8 +5,10 @@ gemspec
 group :development do
   gem "maruku"
   gem "yard"
-  gem "pry-byebug"
-  gem "pry-state"
+  unless RUBY_ENGINE == 'jruby'
+    gem "pry-byebug"
+    gem "pry-state"
+  end
 end
 
 group :test do
