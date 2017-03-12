@@ -262,7 +262,8 @@ module Tickle
     end
 
     def next_appropriate_year(month, day)
-      year = (Date.new(@start.year.to_i, month.to_i, day.to_i) == @start.to_date) ? @start.year + 1 : @start.year
+      start = @start || Date.today
+      year = (Date.new(start.year.to_i, month.to_i, day.to_i) == start.to_date) ? start.year + 1 : start.year
       return year
     end
 
