@@ -3,11 +3,12 @@ source "https://rubygems.org"
 gemspec
 
 group :development do
-  gem "wirble"
   gem "maruku"
   gem "yard"
-  gem "pry-byebug"
-  gem "activesupport"
+  unless RUBY_ENGINE == 'jruby'
+    gem "pry-byebug"
+    gem "pry-state"
+  end
 end
 
 group :test do

@@ -134,7 +134,7 @@ module Tickle
         @until = 
           if  tickled.starting && !tickled.starting.to_s.blank?
             if tickled.until && !tickled.until.to_s.blank?
-              if tickled.until.to_time > tickled.starting.to_time
+              if tickled.until.to_time > @start
                 tickled.until.to_time
               end
             end
