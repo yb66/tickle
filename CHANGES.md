@@ -1,5 +1,13 @@
 # CH CH CH CH CHANGES! #
 
+## Wednesday the 15th of March 2017, v1.1.1 ##
+
+* Bit of easier debugging added in.
+* Bug fixes, thanks to https://github.com/dodomarocgenex for finding and helping with them.
+
+----
+
+
 ## Wednesday the 22nd of February 2017, v1.1.0 ##
 
 * Numerizer duplication removed. Thanks to https://github.com/bjonord.
