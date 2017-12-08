@@ -50,7 +50,7 @@ module Tickle
       # check to see if this event starts some other time and reset now
       scan_expression! tickled
 
-      fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur in the past for a future event") if @start && @start.to_date < Date.today
+      fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur in the past for a future event") if @start && @start.to_date < tickled.now.to_date
       fail(InvalidDateExpression, "the start date (#{@start.to_date}) cannot occur after the end date") if @until && @start.to_date > @until.to_date
 
       # no need to guess at expression if the start_date is in the future
@@ -75,7 +75,7 @@ module Tickle
 
         # if we can't guess it maybe chronic can
         _guess = guess(@tokens, @start)
-        best_guess = _guess || chronic_parse(tickled.event) # TODO fix this call 
+        best_guess = _guess || chronic_parse(tickled.event) # TODO fix this call
       end
 
       fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && (best_guess.to_date > @until.to_date)
@@ -131,7 +131,7 @@ module Tickle
           fail(InvalidDateExpression,"the ending date expression \"#{tickled.ending}\" could not be interpretted")
         end
       else
-        @until = 
+        @until =
           if  tickled.starting && !tickled.starting.to_s.blank?
             if tickled.until && !tickled.until.to_s.blank?
               if tickled.until.to_time > @start
