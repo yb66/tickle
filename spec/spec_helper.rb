@@ -9,8 +9,10 @@ Spec_dir = File.expand_path( File.dirname __FILE__ )
 require 'simplecov'
 SimpleCov.start do
   add_filter "/vendor/"
+  add_filter "/vendor.noindex/"
   add_filter "/bin/"
   add_filter "/spec/"
+  add_filter "/coverage/" # It used to do this for some reason, defensive of me.
 end
 
 
