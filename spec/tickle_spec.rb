@@ -431,6 +431,29 @@ describe "Parsing" do
         it { should == expected }
       end
 
+
+      context "every day" do
+        subject{ Tickle.parse "every day" }
+        let(:expected) {
+          {:next=>Time_now + 86400, :expression=>"every day", :starting=>Time.parse("2010-05-09 20:57:36 +0000"), :until=>nil} }
+        it { should == expected }
+      end
+
+
+      context "every day at 9am" do
+        subject{ Tickle.parse "every day at 9am" }
+        let(:nine_am_tomorrow) { Time.parse("2010-05-10 09:00:00 +0000") }
+        let(:expected) {
+          {
+            :next=> nine_am_tomorrow,
+            :expression=>"every day at 9am",
+            :starting=> nine_am_tomorrow,
+            :until=>nil
+          } 
+        }
+        it { should == expected }
+      end
+
     end
 
     context "Complex examples", :frozen => true do
