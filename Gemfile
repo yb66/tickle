@@ -8,6 +8,7 @@ group :development do
   unless RUBY_ENGINE == 'jruby'
     gem "pry-byebug"
     gem "pry-state"
+    gem "rb-readline"
   end
 end
 
