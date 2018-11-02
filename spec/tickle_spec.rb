@@ -241,6 +241,14 @@ describe "Parsing" do
         end
       end
 
+      context "Given that start is in the past, respect now option in parse" do
+        context "every other day" do
+          subject{ Tickle.parse('every other day', {:start=>Time.parse("2009-05-09 00:00:00 +0000"), :now=>Time.parse("2009-05-09 00:00:00 +0000"), :until=>Time.parse("2017-10-21 00:00:00 +0000") }) }
+          let(:expected) { {:next=>Time.parse("2009-05-11 00:00:00 +0000"), :expression=>"every other day", :starting=>Time.parse("2009-05-09 00:00:00 +0000"), :until=>nil} }
+          it { should == expected }
+        end
+      end
+
       context "Given that now is in the future, 2020-04-01 00:00:00 +0000" do
         context "February" do
           subject{ Tickle.parse('February', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
