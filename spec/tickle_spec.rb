@@ -455,7 +455,7 @@ describe "Parsing" do
           {
             :next=> nine_am_tomorrow,
             :expression=>"every day at 9am",
-            :starting=> nine_am_tomorrow,
+            :starting=> Time.now,
             :until=>nil
           } 
         }
