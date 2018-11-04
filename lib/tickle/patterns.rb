@@ -10,7 +10,11 @@ module Tickle
     /x
 
     ON_THE = /
-      \bon\b
+      (?:
+        \bon\b
+          |
+        \bat\b
+      )
       (?:
         \s+
         the
