@@ -73,7 +73,7 @@ module Tickle
 
     # Returns an array of types for all tokens
     def self.types(tokens)
-      tokens.map(&:type)
+      tokens.map(&:type).sort
     end
 
 

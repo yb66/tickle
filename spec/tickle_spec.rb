@@ -371,9 +371,9 @@ describe "Parsing" do
         end
 
         context "the 1st Wednesday of the month" do
-          subject{ Tickle.parse('the 1st wednesday of the month', {:start=>Time.parse("2020-04-01 00:00:00 +0000"), :now=>Time.parse("2020-04-01 00:00:00 +0000")}) }
+          subject{ Tickle.parse('the 1st wednesday of the month', {:start=>Time.parse("2 Apr 2020 00:00:00 +0000"), :now=>Time.parse("2 Apr 2020 00:00:00 +0000")}) }
           let(:expected) {
-            {:next=>Time.parse("2020-05-01 00:00:00 +0000"), :expression=>"the 1st wednesday of the month", :starting=>Time.parse("2020-04-01 00:00:00 +0000"), :until=>nil}
+            {:next=>Time.parse("8 Apr 2020 12:00:00 +0000"), :expression=>"the 1st wednesday of the month", :starting=>Time.parse("2020-04-02 00:00:00 +0000"), :until=>nil}
           }
           it { should == expected }
         end

@@ -73,8 +73,9 @@ module Tickle
         # combine number and ordinals into single number
         @tokens = Helpers.combine_multiple_numbers(@tokens)
 
+        guesser = Tickle::Handler.new @tokens, @start
         # if we can't guess it maybe chronic can
-        _guess = guess(@tokens, @start)
+        _guess = guesser.guess
         best_guess = _guess || chronic_parse(tickled.event) # TODO fix this call
       end
 
@@ -93,17 +94,17 @@ module Tickle
     def scan_expression!(tickled)
       starting,ending,event = nil, nil, nil
       if (md = Patterns::START_EVERY_REGEX.match tickled)
-          starting = md[:start].strip
-          text = md[:event].strip
+          starting  = md[:start].strip
+          text      = md[:event].strip
           event, ending = process_for_ending(text)
       elsif (md = Patterns::EVERY_START_REGEX.match tickled)
-          event = md[:event].strip
-          text = md[:start].strip
+          event     = md[:event].strip
+          text      = md[:start].strip
           starting, ending = process_for_ending(text)
       elsif (md = Patterns::START_ENDING_REGEX.match tickled)
-          starting = md[:start].strip
-          ending = md[:finish].strip
-          event = 'day'
+          starting  = md[:start].strip
+          ending    = md[:finish].strip
+          event     = 'day'
         else
           event, ending = process_for_ending(text)
       end
