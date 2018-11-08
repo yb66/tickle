@@ -7,28 +7,28 @@ module Tickle # for convenience
 describe "Token" do
 
   describe "The basics" do
-    subject { Token.new( "" ) }
-    it { should be_a_kind_of ::String }
-    it { should respond_to :original }
-    it { should respond_to :word }
-    it { should respond_to :type }
-    it { should respond_to :interval }
-    it { should respond_to :start }
-    it { should respond_to :update! }
-    it { should respond_to :normalize! }
+    When(:token) { Token.new( "" ) }
+    Then { token.kind_of? String }
+    Then { token.respond_to? :original }
+    Then { token.respond_to? :word }
+    Then { token.respond_to? :type }
+    Then { token.respond_to? :interval }
+    Then { token.respond_to? :start }
+    Then { token.respond_to? :update! }
+    Then { token.respond_to? :normalize! }
   end
 
 
   describe "Instantation" do
     context "Given a token" do
       context "and no options" do
-        subject { Token.new( "Today" ) }
-        its(:original) { should == "Today" }
-        its(:word) { should be_nil }
-        its(:type) { should be_nil }
-        its(:interval) { should be_nil }
-        its(:start) { should be_nil }
-        it { should == "Today" }
+        When(:token) { Token.new( "Today" ) }
+        Then { token.original == "Today" }
+        Then { token.word == "today" }
+        Then { token.type.nil? }
+        Then { token.interval.nil? }
+        Then { token.start.nil? }
+        Then { token == "Today" }
       end
     end
   end
@@ -37,14 +37,14 @@ describe "Token" do
     context "Given a token" do
       context "That is not a number" do
         context "and no options" do
-          subject { Token.new( "Today" ).normalize! }
+          subject { Token.new( "Today" ) }
           it { should == "Today" }
           its(:word) { should == "today" }
         end
       end
       context "That is a number" do
         context "and no options" do
-          subject { Token.new( "Twenty" ).normalize! }
+          subject { Token.new( "Twenty" ) }
           it { should == "Twenty" }
           its(:word) { should == "20" }
         end
@@ -59,22 +59,32 @@ describe "Token" do
 
 
   describe "tokenize" do
-    subject { Token.tokenize "Next Monday" }
-    it { should == ["Next", "Monday"] }
-    its(:first) { should be_a_kind_of Token }
+    When(:tokens) { Tokens.new "Every Monday" }
+    Then { tokens == ["Monday"] }
+    Then { tokens.all?{|token| token.kind_of? Token } }
   end
 
 
-  describe "scan" do
-    context "Given an invalid argument" do
-      it {
-        expect {Token.scan Token.tokenize 9999}.to raise_error ArgumentError
-      }
+  describe "combine_multiple_numbers" do
+    context "When given compound numbers" do
+      context "like 'twenty first'" do
+        Given(:tokens) {
+          tokens = Tokens.new []
+          tokens.replace [
+            Token.new("twenty", word: "20", type: :number, start: 20, interval: 20),
+            Token.new("first", word: "1st", type: :ordinal, start: 1, interval: 1),
+          ]
+          tokens
+        }
+        When(:first) { tokens.combine_multiple_numbers.first }
+        Then { first.original == "twenty first" } 
+        And { first.word == "21st" }
+        And { first.type == :ordinal }
+        And { first.start == "21" }
+        And { first.interval ==  365 }
+      end
     end
-    context "Given a valid argument (tokens)" do
-      subject { Token.scan! Token.tokenize "Next Monday" }
-      it { should == ["Next", "Monday"] }
-    end
+
   end
 
 end

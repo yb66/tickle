@@ -8,18 +8,17 @@ module Tickle
   class Handler
 
     class << self
-
-      # runs Chronic.parse with now being set to the specified start date for Tickle parsing
-      def chronic_parse_with_start(exp,start)
-        Chronic.parse(exp, :now => start)
-      end
-
-
       # needed to handle the unique situation where a number or ordinal plus optional month or month name is passed that is EQUAL to the start date since Chronic returns that day.
       def handle_same_day_chronic_issue(year, month, day, start)
         Date.new(year.to_i, month.to_i, day.to_i) == start.to_date ?
           Time.local(year, month+1, day) :
           Time.local(year, month, day)
+      end
+
+
+      # runs Chronic.parse with now being set to the specified start date for Tickle parsing
+      def chronic_parse_with_start(exp,start)
+        Chronic.parse(exp, :now => start)
       end
     end
 
@@ -41,9 +40,10 @@ module Tickle
     def guess
       return nil if tokens.empty?
 
-      _next = @algos.each {|name,block|
-        result = block.call tokens, start
-        break result unless result.nil?
+      _next = nil
+      @algos.each {|name,block|
+        _next = block.call tokens, start
+        break unless _next.nil?
       }
 
       # check to see if next is less than now and, if so, set it to next year

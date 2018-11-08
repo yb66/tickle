@@ -1,12 +1,29 @@
+require_relative "../ext/string.rb"
+
 module Tickle
-  require_relative "../ext/string.rb"
-  class Repeater
-    require_relative "token.rb"
+  module Repeater
 
-    attr_reader :tokens
+    # Returns the next available month based on the current day of the month.
+    # For example, if get_next_month(15) is called and the start date is the 10th, then it will return the 15th of this month.
+    # However, if get_next_month(15) is called and the start date is the 18th, it will return the 15th of next month.
+    def get_next_month(number,start=nil)
+      start ||= @start || Time.now
+      month =
+        if number.to_i < start.day
+          start.month == 12 ?
+            1 :
+            start.month + 1
+        else
+          start.month
+        end
+    end
 
-    def initialize( tokens )
-      @tokens = tokens.map(&:clone)
+
+    # Return the number of days in a specified month.
+    # If no month is specified, current month is used.
+    def days_in_month(month=nil)
+      month ||= Date.today.month
+      days_in_mon = Date.civil(Date.today.year, month, -1).day
     end
 
     
@@ -22,18 +39,21 @@ module Tickle
     ]
 
 
-    #
+    # @return [Array<Tickle::Token>]
     def scan!
       # for each token
-      @tokens.each do |token|
+      @tokens.map! do |token|
         new_details = catch(:token_found) {
-          SCANNING_METHODS.each{|meth|
-            send meth, token
-          }
+          SCANNING_METHODS.each{|meth| send meth, token }
           nil # if nothing matched, set to nil
         }
-        token.update! new_details if new_details
+        if new_details
+          token.update! new_details
+        else
+          nil
+        end
       end
+      @tokens = @tokens.compact
       self
     end
 
@@ -54,6 +74,7 @@ module Tickle
       (?<number>\d\d?)
       \b
     /x
+
 
     def scan_for_numbers(token)
       detection token, SCAN_FOR_NUMBERS do |md,key,value|
@@ -92,7 +113,7 @@ module Tickle
       detection token, SCAN_FOR_ORDINAL_NAMES do |md,key,value|
           { :type     =>  :ordinal,
             :start    =>  value.ordinal_as_number,
-            :interval =>  Tickle::Helpers.days_in_month( Tickle::Helpers.get_next_month( value.ordinal_as_number )),
+            :interval =>  days_in_month( get_next_month( value.ordinal_as_number )),
           }
       end
     end
@@ -112,30 +133,33 @@ module Tickle
       \b
     /x
 
+
     def scan_for_ordinals(token)
       detection token, SCAN_FOR_ORDINALS do |md,key,value|
         number = Ordinal.new(md[:number])
         { :type     =>  :ordinal,
           :start    =>  number.ordinal_as_number,
-          :interval =>  Tickle::Helpers.days_in_month(Tickle::Helpers.get_next_month number )
+          :interval =>  days_in_month(get_next_month number )
         }
       end
     end
 
 
     def scan_for_month_names(token)
-      scanner = {/^jan\.?(uary)?$/ => 1,
-        /^feb\.?(ruary)?$/ => 2,
-        /^mar\.?(ch)?$/ => 3,
-        /^apr\.?(il)?$/ => 4,
-        /^may$/ => 5,
-        /^jun\.?e?$/ => 6,
-        /^jul\.?y?$/ => 7,
-        /^aug\.?(ust)?$/ => 8,
-        /^sep\.?(t\.?|tember)?$/ => 9,
-        /^oct\.?(ober)?$/ => 10,
-        /^nov\.?(ember)?$/ => 11,
-      /^dec\.?(ember)?$/ => 12}
+      scanner = {
+        /^jan\.?(uary)?$/         => 1,
+        /^feb\.?(ruary)?$/        => 2,
+        /^mar\.?(ch)?$/           => 3,
+        /^apr\.?(il)?$/           => 4,
+        /^may$/                   => 5,
+        /^jun\.?e?$/              => 6,
+        /^jul\.?y?$/              => 7,
+        /^aug\.?(ust)?$/          => 8,
+        /^sep\.?(t\.?|tember)?$/  => 9,
+        /^oct\.?(ober)?$/         => 10,
+        /^nov\.?(ember)?$/        => 11,
+        /^dec\.?(ember)?$/        => 12
+      }
       detection token, scanner do |md,key,value|
         {
           :type     =>  :month_name,

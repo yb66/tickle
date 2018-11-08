@@ -1,10 +1,11 @@
+require 'numerizer'
+require_relative "repeater.rb"
+
 module Tickle
 
-  require 'numerizer'
-  require_relative "repeater.rb"
 
   # An extended String
-  class Token < ::String
+  class Token < String
     attr_accessor :original
 
 
@@ -21,6 +22,7 @@ module Tickle
     def initialize(original, options={})
       @original = original
       @word     = options[:word]
+      normalize!
       @type     = options[:type]
       @interval = options[:interval]
       @start    = options[:start]
@@ -59,35 +61,70 @@ module Tickle
                 .gsub(COMMON_SYMBOLS) {" #{$1} "}
       self
     end
+  end
 
 
-    # Split the text on spaces and convert each word into
-    # a Token
-    # @param [#split] text The text to be tokenized.
-    # @return [Array<Token>] The tokens.
-    def self.tokenize(text)
-      fail ArgumentError unless text.respond_to? :split
-      text.split(/\s+/).map { |word| Token.new(word) }
+  class Tokens < Array
+    include Repeater
+
+
+    # split into tokens and then
+    # process each original word for implied word
+    # scan the tokens with each token scanner
+    # remove all tokens without a type
+    def initialize tokens
+      if tokens.respond_to? :split
+        words = tokens.split(/\s+/)
+        @tokens = words.map {|word| Token.new(word) }
+      elsif tokens.respond_to? :map
+        if tokens.all? {|token| token.kind_of? Token }
+          @tokens = tokens
+        else
+          @tokens = tokens.map {|token| Token.new(token) }
+        end
+      else
+        fail ArgumentError, "You must pass something that can be tokenized, either a string or an array of strings."
+      end
+      normalize!
+      super @tokens
+    end
+
+
+    def normalize!
+      scan!.combine_multiple_numbers
     end
 
 
     # Returns an array of types for all tokens
-    def self.types(tokens)
-      tokens.map(&:type).sort
+    def types
+      map(&:type)
     end
 
 
-    def self.token_of_type(type, tokens)
-      tokens.detect {|token| token.type == type}
+    def by_type
+      Hash[ map{|t| [t, t.type] } ]
     end
 
 
-    # @return [Array<Tickle::Token>]
-    def self.scan!( tokens )
-      fail ArgumentError, "Token#scan must be provided with and Array of Tokens to work with." unless tokens.respond_to? :each
-      repeater = Repeater.new tokens
-      repeater.scan!
-      repeater.tokens
+    def token_of_type(type)
+      detect {|token| token.type == type}
+    end
+
+
+      # Turns compound numbers, like 'twenty first' => 21
+    def combine_multiple_numbers
+      if number = token_of_type(:number)
+        num_index = index(number)
+        if (ordinal = self[num_index + 1]).type == :ordinal
+          combined_original = "#{number.original} #{ordinal.original}"
+          combined_word = (number.start.to_s[0] + ordinal.word)
+          combined_value = (number.start.to_s[0] + ordinal.start.to_s)
+          delete_at num_index + 1
+          delete_at num_index
+          insert num_index, Token.new(combined_original, word: combined_word, type: :ordinal, start: combined_value, interval: 365)
+        end
+      end
+      self
     end
 
   end

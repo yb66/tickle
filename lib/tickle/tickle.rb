@@ -59,18 +59,8 @@ module Tickle
       else
         # put the text into a normal format to ease scanning using Chronic
         tickled.filtered = tickled.event.filter
-        # split into tokens and then
-        # process each original word for implied word
-        @tokens = post_tokenize Token.tokenize(tickled.filtered)
 
-        # scan the tokens with each token scanner
-        @tokens = Token.scan!(@tokens)
-
-        # remove all tokens without a type
-        @tokens.reject! {|token| token.type.nil? }
-
-        # combine number and ordinals into single number
-        @tokens = Helpers.combine_multiple_numbers(@tokens)
+        @tokens = Tokens.new tickled.filtered
 
         guesser = Tickle::Handler.new @tokens, @start
         # if we can't guess it maybe chronic can
@@ -151,15 +141,6 @@ module Tickle
       (md = Patterns::PROCESS_FOR_ENDING.match text) ?
         [ md[:target], md[:ending] ] :
         [text, nil]
-    end
-
-    # normalizes each token
-    def post_tokenize(tokens)
-      _tokens = tokens.map(&:clone)
-      _tokens.each do |token|
-        token.normalize!
-      end
-      _tokens
     end
 
 
