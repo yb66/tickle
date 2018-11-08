@@ -1,5 +1,6 @@
 require_relative "token.rb"
 require_relative "handler/algorithms.rb"
+require 'chronic'
 
 module Tickle
 
