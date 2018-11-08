@@ -76,7 +76,7 @@ module Tickle
         guesser = Tickle::Handler.new @tokens, @start
         # if we can't guess it maybe chronic can
         _guess = guesser.guess
-        best_guess = _guess || chronic_parse(tickled.event) # TODO fix this call
+        best_guess = _guess || chronic_parse(tickled.event, tickled, @start || @until ) # TODO fix this call
       end
 
       fail(InvalidDateExpression, "the next occurrence takes place after the end date specified") if @until && (best_guess.to_date > @until.to_date)
