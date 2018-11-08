@@ -23,7 +23,6 @@ module Tickle
 
   require_relative "patterns.rb"
   require 'numerizer'
-  require_relative "helpers.rb"
   require_relative "token.rb"
   require_relative "tickled.rb"
 

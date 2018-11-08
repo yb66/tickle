@@ -1,4 +1,3 @@
-require_relative "helpers.rb"
 require_relative "token.rb"
 require_relative "handler/algorithms.rb"
 
