@@ -2,8 +2,8 @@
 
 require 'rspec'
 require 'rspec/its'
+require 'rspec/given'
 Spec_dir = File.expand_path( File.dirname __FILE__ )
-
 
 # code coverage
 require 'simplecov'

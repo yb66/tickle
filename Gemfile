@@ -15,6 +15,7 @@ end
 group :test do
   gem "rspec"
   gem "rspec-its"
+  gem "rspec-given"
   gem "timecop"
   gem "simplecov"
   gem "rake"
