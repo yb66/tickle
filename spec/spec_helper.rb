@@ -41,3 +41,11 @@ RSpec.configure do |config|
 end
 
 warn "Actual Time now => #{Time.now}"
+
+
+if ENV["DEBUG"]
+  warn "DEBUG MODE ON"
+  require 'pry-byebug'
+  require 'pry-state'
+  binding.pry
+end

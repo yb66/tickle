@@ -7,13 +7,6 @@
 #=============================================================================
 
 
-if ENV["DEBUG"]
-  warn "DEBUG MODE ON"
-  require 'pry-byebug'
-  require 'pry-state'
-  binding.pry
-end
-
 require 'date'
 require 'time'
 require 'chronic'
