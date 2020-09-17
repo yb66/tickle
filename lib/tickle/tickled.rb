@@ -1,10 +1,9 @@
-require 'chronic'
 require 'texttube/base'
 require_relative "filters.rb"
-require 'chronic'
+require 'gitlab-chronic'
 
 module Tickle
-      
+
 
 
   # Contains the initial input and the result of parsing it.
@@ -39,7 +38,7 @@ module Tickle
         end
       end
 
-      t = 
+      t =
         if asked.respond_to?(:to_time)
           asked
         elsif (t = Time.parse(asked) rescue nil) # a legitimate use!
@@ -129,7 +128,7 @@ module Tickle
 
     [:starting, :ending, :event].each do |meth|
       define_method meth do
-        @opts[meth] 
+        @opts[meth]
       end
       define_method "#{meth}=" do |value|
         @opts[meth] = Tickled.new value
@@ -157,13 +156,13 @@ module Tickle
     def to_s
       self
     end
-  
+
     def blank?
       if respond_to? :empty?
         empty? || !self
       elsif respond_to? :localtime
         false
-      end 
+      end
     end
 
 #     def inspect

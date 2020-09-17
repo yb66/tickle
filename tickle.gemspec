@@ -17,11 +17,11 @@ Gem::Specification.new do |s|
   s.files         = `git ls-files`.split($/)
   s.executables   = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.test_files    = s.files.grep(%r{^(test|spec|features)/})
-  
+
   s.require_paths = ["lib"]
 
   s.add_dependency "numerizer", "~> 0.2.0"
-  s.add_dependency "chronic",   "~> 0.10.2"
+  s.add_dependency "gitlab-chronic",   "~> 0.10.6"
   s.add_dependency "texttube",  "~> 6.0.0"
 end
 
