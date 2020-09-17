@@ -1,8 +1,8 @@
 language: ruby
 rvm:
-  - 2.2.0
-  - ruby-head
-  - jruby-19mode
+  - 2.7
+  - jruby
+  - truffleruby
 
 # whitelist
 branches:
