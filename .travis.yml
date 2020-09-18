@@ -1,0 +1,12 @@
+language: ruby
+rvm:
+  - 2.7
+  - jruby
+  - truffleruby
+
+# whitelist
+branches:
+  only:
+    - master
+    - develop
+    - v1-branch

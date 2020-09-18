@@ -20,14 +20,15 @@ Gem::Specification.new do |s|
   
   s.require_paths = ["lib"]
 
-  s.add_dependency "chronic", "~> 0.2.3"
+  s.add_dependency "gitlab-chronic", "~> 0.10.6"
+  s.add_dependency "numerizer", "~> 0.2.0"
   s.add_development_dependency "shoulda", "~> 2.10.3"
   s.add_development_dependency "simplecov"
   s.add_development_dependency "test-unit"
-
-  s.add_development_dependency "bundler", "~> 1.2"
+  s.add_development_dependency "bundler"
   s.add_development_dependency "rake"
   s.add_development_dependency "yard"
   s.add_development_dependency "maruku"
+  s.add_development_dependency "timecop"
 end
 

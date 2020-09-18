@@ -18,7 +18,7 @@ end
 
 require 'date'
 require 'time'
-require 'chronic'
+require 'gitlab-chronic'
 
 require 'tickle/tickle'
 require 'tickle/handler'

@@ -1,12 +1,22 @@
 # CH CH CH CH CHANGES! #
 
+## Friday the 18th of September 2020, v1.2.0
+
+- Changed the dependency from chronic to gitlab-chronic
+- Required numerizer explicitly to stop a bug
+- Formatted the regex for legibility
+- Fixed bug with "today and" in the tests
+- Fixed a bug previously fixed on the v2 branch in 2f2a32ce9 with @start
+- Added Timecop because we're beyond the date chosen in the tests. Tempus fugit!
+
+----
+
 ## Wednesday the 15th of March 2017, v1.1.1 ##
 
 * Bit of easier debugging added in.
 * Bug fixes, thanks to https://github.com/dodomarocgenex for finding and helping with them.
 
 ----
-
 
 ## Wednesday the 22nd of February 2017, v1.1.0 ##
 
