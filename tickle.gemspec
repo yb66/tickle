@@ -20,7 +20,7 @@ Gem::Specification.new do |s|
   
   s.require_paths = ["lib"]
 
-  s.add_dependency "chronic", "~> 0.2.3"
+  s.add_dependency "gitlab-chronic", "~> 0.10.6"
   s.add_development_dependency "shoulda", "~> 2.10.3"
   s.add_development_dependency "simplecov"
   s.add_development_dependency "test-unit"

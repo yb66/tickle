@@ -407,7 +407,7 @@ or if you're using Bundler, add this to the Gemfile:
 
 Chronic gem:
 
-`gem install chronic`
+`gem install gitlab-chronic`
 
 thoughtbot's [shoulda](https://rubygems.org/gems/shoulda):
 

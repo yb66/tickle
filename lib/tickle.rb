@@ -11,7 +11,7 @@ $LOAD_PATH.unshift(File.dirname(__FILE__))     # For use/testing when no gem is 
 
 require 'date'
 require 'time'
-require 'chronic'
+require 'gitlab-chronic'
 
 require 'tickle/tickle'
 require 'tickle/handler'
