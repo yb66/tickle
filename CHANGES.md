@@ -1,5 +1,11 @@
 # CH CH CH CH CHANGES! #
 
+## Friday the 18th of September 2002, v2.0.0rc3
+
+* Changed the dependency from chronic to gitlab-chronic, thanks to @bjonord
+
+----
+
 ## v2.0.0.rc2, Friday the 8th of December 2017 ##
 
 * Fixed issue #20 https://github.com/yb66/tickle/pull/20, thanks to [@antogon](https://github.com/antogon)
