@@ -4,15 +4,21 @@ require 'test/unit'
 
 class TestParsing < Test::Unit::TestCase
 
+	Time_now = Time.parse "2010-05-09 20:57:36 +0000"
   def setup
     Tickle.debug = (ARGV.detect {|a| a == '--d'})
     @verbose = (ARGV.detect {|a| a == '--v'})
-
-    puts "Time.now"
-    p Time.now
+		Timecop.freeze Time_now
+		ENV["TZ"] = "UTC"
 
     @date = Date.today
+    @tz = ENV["TZ"]
   end
+
+	def teardown
+		Timecop.return
+		ENV["TZ"] = @tz
+	end
 
   def test_parse_best_guess_simple
     start = Date.new(2020, 04, 01)
@@ -85,11 +91,14 @@ class TestParsing < Test::Unit::TestCase
     assert_date_match(Date.new(2020, 04, 21), 'the twenty first of the month', {:start => start, :now => start})
   end
 
-  def test_parse_best_guess_complex
-    start = Date.new(2020, 04, 01)
-
+  def test_parse_best_guess_complex_and
     assert_tickle_match(@date.bump(:day, 1), @date, @date.bump(:week, 1), 'day', 'starting today and ending one week from now') if Time.now.hour < 21 # => demonstrates leaving out the actual time period and implying it as daily
     assert_tickle_match(@date.bump(:day, 1), @date.bump(:day, 1), @date.bump(:week, 1), 'day','starting tomorrow and ending one week from now') # => demonstrates leaving out the actual time period and implying it as daily.
+	end
+
+
+  def test_parse_best_guess_complex
+    start = Date.new(2020, 04, 01)
 
     assert_tickle_match(@date.bump(:wday, 'Mon'), @date.bump(:wday, 'Mon'), nil, 'month', 'starting Monday repeat every month')
 

@@ -19,6 +19,8 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+require 'numerizer'
+
 module Tickle
   class << self
     # == Configuration options
@@ -105,9 +107,25 @@ module Tickle
     def scan_expression(text, options)
       starting = ending = nil
 
-      start_every_regex = /^(start(?:s|ing)?)\s(.*)(\s(?:every|each|\bon\b|repeat)(?:s|ing)?)(.*)/i
+      start_every_regex = /^
+        (start(?:s|ing)?)                 # 0
+        \s
+        (.*)
+        (\s(?:every|each|\bon\b|repeat)   # 1
+        (?:s|ing)?)                       # 2
+        (.*)                              # 3
+      /ix
       every_start_regex = /^(every|each|\bon\b|repeat(?:the)?)\s(.*)(\s(?:start)(?:s|ing)?)(.*)/i
-      start_ending_regex = /^(start(?:s|ing)?)\s(.*)(\s(?:\bend|until)(?:s|ing)?)(.*)/i
+      start_ending_regex = /^
+        (start(?:s|ing)?)   # 0
+        \s+
+        (.*?)(?:\s+and)?      # 1
+        (\s
+          (?:\bend|until)
+          (?:s|ing)?
+        )                   # 2
+        (.*)                # 3
+      /ix
       if text =~ start_every_regex
         starting = text.match(start_every_regex)[2].strip
         text = text.match(start_every_regex)[4].strip
@@ -117,8 +135,9 @@ module Tickle
         text = text.match(every_start_regex)[4].strip
         starting, ending = process_for_ending(text)
       elsif text =~ start_ending_regex
-        starting = text.match(start_ending_regex)[2].strip
-        ending = text.match(start_ending_regex)[4].strip
+        md = text.match start_ending_regex
+        starting = md.captures[1]
+        ending = md.captures.last.strip
         event = 'day'
       else
         event, ending = process_for_ending(text)
@@ -127,6 +146,7 @@ module Tickle
       # they gave a phrase so if we can't interpret then we need to raise an error
       if starting
         Tickle.dwrite("starting: #{starting}")
+        @start ||= nil # initialize the variable to quell warnings
         @start = chronic_parse(pre_filter(starting))
         if @start
           @start.to_time
@@ -172,8 +192,7 @@ module Tickle
       text.gsub!(/repeat(s|ing)?(\s)?/, '')
       text.gsub!(/on the(\s)?/, '')
       text.gsub!(/([^\w\d\s])+/, '')
-      text.downcase.strip
-      text = normalize_us_holidays(text)
+      normalize_us_holidays(text.downcase.strip)
     end
 
     # Split the text on spaces and convert each word into
@@ -262,7 +281,8 @@ module Tickle
     end
 
     def next_appropriate_year(month, day)
-      year = (Date.new(@start.year.to_i, month.to_i, day.to_i) == @start.to_date) ? @start.year + 1 : @start.year
+      start = @start || Date.today
+      year = (Date.new(start.year.to_i, month.to_i, day.to_i) == start.to_date) ? start.year + 1 : start.year
       return year
     end
 
